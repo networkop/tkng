@@ -1,0 +1,14 @@
+baseURL = "http://k8s.networkop.co.uk/"
+languageCode = "en-us"
+title = "Kubernetes Networking Guide"
+theme = "hugo-theme-learn"
+
+
+[outputs]
+home = [ "HTML", "RSS", "JSON"]
+
+
+[params]
+    description = "Kubernetes Networking Guide"
+    showVisitedLinks = false
+    themeVariant = "blue"
