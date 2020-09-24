@@ -9,6 +9,27 @@ home = [ "HTML", "RSS", "JSON"]
 
 
 [params]
-    description = "Kubernetes Networking Guide"
+    description = "The Ultimate Kubernetes Networking Guide"
     showVisitedLinks = false
-    themeVariant = "blue"
+    disableLanguageSwitchingButton = true
+    disableMermaid = true
+    editURL = "https://github.com/networkop/k8s-networking-guide/content/"
+    disableInlineCopyToClipBoard = true
+
+
+[[menu.shortcuts]] 
+name = "<i class='fab fa-github'></i> Github repo"
+identifier = "ds"
+url = "https://github.com/networkop/k8s-networking-guide"
+weight = 10
+
+[[menu.shortcuts]] 
+name = "<i class='fas fa-flask'></i> Lab repo"
+identifier = "labs"
+url = "https://github.com/networkop/k8s-guide-labs"
+weight = 20
+
+[[menu.shortcuts]]
+name = "<i class='fas fa-bullhorn'></i> Credits"
+url = "/credits"
+weight = 30
