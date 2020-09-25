@@ -98,7 +98,7 @@ make up
 In order to stop the cluster (e.g. to free up resources) run:
 
 ```
-make stop
+make down
 ````
 
 In order to rebuild the cluster (combined `up` and `down`) run:
@@ -111,7 +111,7 @@ To completely destroy the lab environment, including the caching registry run:
 
 
 ```
-make destroy
+make cleanup
 ```
 
 
