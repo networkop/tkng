@@ -1,5 +1,5 @@
 ---
-title: CNI Overview
+title: CNI
 menuTitle: "CNI"
 weight: 10
 summary: Pod Networking within and between Nodes
@@ -51,11 +51,11 @@ These functions can be performed by the same monolithic plugin or via a **plugin
 
 ## Operation
 
-Contrary to the typical network plugin design approach that includes a long-lived stateful plugin, [CNI Specification](https://github.com/containernetworking/cni/blob/master/SPEC.md) defines an interface -- a set of input/output parameters that a CNI binary is expected to ingest/produce. This makes for a very clean design that is also very easy to swap and upgrade. The most beautiful thing is that the plugin becomes completely stateless -- it's just a binary file on a disk that gets invoked whenever a Pod gets created or deleted. Here's a sequence of steps that a container runtime has to do whenever a new Pod gets created:
+Contrary to the typical network plugin design approach that includes a long-lived stateful daemon, [CNI Specification](https://github.com/containernetworking/cni/blob/master/SPEC.md) defines an interface -- a set of input/output parameters that a CNI binary is expected to ingest/produce. This makes for a very clean design that is also very easy to swap and upgrade. The most beautiful thing is that the plugin becomes completely stateless -- it's just a binary file on a disk that gets invoked whenever a Pod gets created or deleted. Here's a sequence of steps that a container runtime has to do whenever a new Pod gets created:
 
 1. It creates a new network namespace.
-2. It reads and parses the CNI configuration file from a well-known location (normally it's `/etc/cni/net.d`)
-3. For every plugin that it finds, it invokes the corresponding binary, passing it the following information:
+2. It reads and parses the CNI configuration file -- the (numerically) first file from `/etc/cni/net.d`
+3. For every plugin specified in the configuration file, it invokes the corresponding binary, passing it the following information:
     * Environment variables `CNI_COMMAND`, `CNI_CONTAINERID`, `CNI_NETNS`, `CNI_IFNAME`, `CNI_PATH` and `CNI_ARGS`.
     * A minified version of the CNI configuration file (excluding any other plugins).
 
@@ -67,16 +67,21 @@ CNI_CONTAINERID=cid \
 CNI_NETNS=/var/run/netns/id \
 CNI_IFNAME=eth0 \
 CNI_PATH=/opt/bin/bin \
-CNI_ARGS=K8S_POD_NAMESPACE=foo;K8S_POD_NAME=bar;
-cni_plugin < /etc/cni/net.d/cni.conf
+CNI_ARGS=K8S_POD_NAMESPACE=foo;K8S_POD_NAME=bar; \
+cni_plugin < /etc/cni/net.d/01-cni.conf
 ```
 
-The CNI plugin then does all of the required interface plumbing and IP allocation and returns back (prints to stdout) the resulting [data structure](https://github.com/containernetworking/cni/blob/master/SPEC.md#result). In the case of plugin chaining, all this information (original inputs + result) gets passed to all other plugins along the chain.
+The CNI plugin then does all of the required interface plumbing and IP allocation and returns back (prints to stdout) the resulting [data structure](https://github.com/containernetworking/cni/blob/master/SPEC.md#result). In the case of plugin chaining, all this information (original inputs + result) gets passed to all plugins along the chain.
 
-Despite its design simplicity, unless you have something else that takes care of establishing end-to-end reachability (e.g. cloud controller), a CNI binary must be accompanied by a long-running stateful daemon/agent. This daemon usually runs in the root network namespace and manages the Node's network stack between CNI binary invocations -- at the very least it adds and removes static routes as Nodes are added or removed from the cluster. It's operation is not dictated by any standard and the only requirement is to established Pod-to-Pod reachability. In reality, this daemon performs many more functions, way beyond simple reachability.
+Despite its design simplicity, unless you have something else that takes care of establishing end-to-end reachability (e.g. cloud controller), a CNI binary must be accompanied by a long-running stateful daemon/agent. This daemon usually runs in the root network namespace and manages the Node's network stack between CNI binary invocations -- at the very least it adds and removes static routes as Nodes are added to or removed from the cluster. It's operation is not dictated by any standard and the only requirement is to established Pod-to-Pod reachability. 
+
+{{% notice note %}}
+In reality, this daemon does a lot more than just manage reachability and may include kube-proxy replacement, Kubernetes controller, IPAM etc.
+{{% /notice %}}
+
 
 {{% notice tip %}}
-See [meshnet-cni](https://github.com/networkop/meshnet-cni#architecture) for an example.
+See [meshnet-cni](https://github.com/networkop/meshnet-cni#architecture) for an example of binary+daemon architecture.
 {{% /notice %}}
 
 

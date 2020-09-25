@@ -120,4 +120,14 @@ make destroy
 The lab cluster is setup with a couple of applications that will be used throughout this guide:
 
 1. **[Weave Scope](https://github.com/weaveworks/scope)** -- a tool to visualise and monitor Kubernetes cluster workloads.
+
+{{% notice tip %}}
+To connect to Weave Scope's front-end, run `make connect` and go to [http://localhost:8080](http://localhost:8080)
+{{% /notice %}}
+
+
 2. **[netshoot](https://github.com/nicolaka/netshoot)** -- deployed as a Daemonset, a docker image pre-installed with a wide range of network troubleshooting tools.
+
+{{% notice tip %}}
+To connect to a Pod running on a particular Node (e.g. k8s-guide-worker), run `NODE=k8s-guide-worker make tshoot`
+{{% /notice %}}
