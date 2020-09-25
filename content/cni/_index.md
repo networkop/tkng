@@ -12,12 +12,22 @@ The official documentation [outlines](https://kubernetes.io/docs/concepts/cluste
 * **Connectivity** - making sure that a Pod gets its default `eth0` interface with IP reachable from the root network namespace of the hosting Node.
 * **Reachability** - making sure that Pods from other Nodes can reach each other directly (without NAT).
 
-Connectivity requirement is the most straigh-forward one to understand -- every Pod must have a NIC to communicate with anything outside of its own network namespace. Some local processes on the Node (e.g. kubelet) need to reach PodIP from the root network namespace (e.g. to perform health and readiness checks), hence the root NS connectivity requirement.
+Connectivity requirement is the most straight-forward one to understand -- every Pod must have a NIC to communicate with anything outside of its own network namespace. Some local processes on the Node (e.g. kubelet) need to reach PodIP from the root network namespace (e.g. to perform health and readiness checks), hence the root NS connectivity requirement.
+
+There are a number of [reference](https://github.com/containernetworking/plugins#main-interface-creating) CNI plugins that can be used to setup connectivity, most notable examples are:
+
+* **ptp** -- creates a veth link in the root namespace and plugs the other end into the Pod's namespace.
+* **bridge** -- does the same but also connects the rootNS end of the link to the bridge.
+* **macvlan/ipvlan** -- use the corresponding drivers to connect containers directly to the NIC of the Node. 
+
+{{% notice info %}}
+These reference plugins are very often combined and re-used by other, more complicated CNI plugins (see [kindnet](/cni/11-kindnet/) or [flannel](/cni/12-flannel)).
+{{% /notice %}}
 
 Reachability, on the other hand, may require a bit of unpacking:
 
-* Every Pod gets a unqiue IP from a `PodCIDR` range configured on the Node.
-* This range is assigned to the Node during kubelet boostrapping phase. 
+* Every Pod gets a unique IP from a `PodCIDR` range configured on the Node.
+* This range is assigned to the Node during kubelet bootstrapping phase. 
 * Nodes are not aware of `PodCIDRs` assigned to other Nodes, allocations are normally managed by the controller-manager based on the `--cluster-cidr` configuration flag.
 * Depending on the type of underlying connectivity, establishing end-to-end reachability between `PodCIDRs` may require different methods:
     - If all Nodes are in the **same Layer2 domain**, the connectivity can be established by configuring a **full mesh of static routes** on all Nodes with NextHop set to the internal IP of the peer Nodes.
@@ -26,7 +36,7 @@ Reachability, on the other hand, may require a bit of unpacking:
         * **Encapsulating in the overlay** -- VXLAN is still the most popular encap type.
 
 {{% notice info %}}
-The above mechanisms are not determined exclusively by the undelying network. Plugins can use a mixture of different methods (e.g. host-based static routes for the same L2 segment and overlays for anything else) and the choice can be made purely based on operational complexity (e.g. overlays over BGP).
+The above mechanisms are not determined exclusively by the underlying network. Plugins can use a mixture of different methods (e.g. host-based static routes for the same L2 segment and overlays for anything else) and the choice can be made purely based on operational complexity (e.g. overlays over BGP).
 {{% /notice %}}
 
 {{% notice note %}}
@@ -73,10 +83,10 @@ cni_plugin < /etc/cni/net.d/01-cni.conf
 
 The CNI plugin then does all of the required interface plumbing and IP allocation and returns back (prints to stdout) the resulting [data structure](https://github.com/containernetworking/cni/blob/master/SPEC.md#result). In the case of plugin chaining, all this information (original inputs + result) gets passed to all plugins along the chain.
 
-Despite its design simplicity, unless you have something else that takes care of establishing end-to-end reachability (e.g. cloud controller), a CNI binary must be accompanied by a long-running stateful daemon/agent. This daemon usually runs in the root network namespace and manages the Node's network stack between CNI binary invocations -- at the very least it adds and removes static routes as Nodes are added to or removed from the cluster. It's operation is not dictated by any standard and the only requirement is to established Pod-to-Pod reachability. 
+Despite its design simplicity, unless you have something else that takes care of establishing end-to-end reachability (e.g. cloud controller), a CNI binary must be accompanied by a long-running stateful daemon/agent. This daemon usually runs in the root network namespace and manages the Node's network stack between CNI binary invocations -- at the very least it adds and removes static routes as Nodes are added to or removed from the cluster. Its operation is not dictated by any standard and the only requirement is to established Pod-to-Pod reachability. 
 
 {{% notice note %}}
-In reality, this daemon does a lot more than just manage reachability and may include kube-proxy replacement, Kubernetes controller, IPAM etc.
+In reality, this daemon does a lot more than just manage reachability and may include a kube-proxy replacement, Kubernetes controller, IPAM etc.
 {{% /notice %}}
 
 
@@ -88,9 +98,9 @@ See [meshnet-cni](https://github.com/networkop/meshnet-cni#architecture) for an 
 
 ## What to know more?
 
-To learn more about CNI, you can search for the "Kubernetes and the CNI: Where We are and What's Next", which I cannot recommend highly enough. It is what's shaped my current view of the CNI and heavily inspired the current article. Some other links I can recommend:
+To learn more about CNI, you can search for the "Kubernetes and the CNI: Where We Are and What's Next", which I cannot recommend highly enough. It is what's shaped my current view of the CNI and heavily inspired the current article. Some other links I can recommend:
 
-* [Slides: Kubernetes and the CNI: Where We are and What's Next](https://www.caseyc.net/cni-talk-kubecon-18.pdf)
+* [Slides: Kubernetes and the CNI: Where We Are and What's Next](https://www.caseyc.net/cni-talk-kubecon-18.pdf)
 * [CNI Specificaion](https://github.com/containernetworking/cni/blob/master/SPEC.md)
 * [CNI plugin implemented in bash](https://www.altoros.com/blog/kubernetes-networking-writing-your-own-simple-cni-plug-in-with-bash/)
 * [EVPN CNI plugin](http://logingood.github.io/kubernetes/cni/2016/05/14/netns-and-cni.html)

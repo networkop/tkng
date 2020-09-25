@@ -1,6 +1,6 @@
 ---
 title: The Kubernetes Network Model
-menuTitle: Architecture
+menuTitle: Network Model
 weight: 5
 summary: "High-level overview of cluster networking components"
 ---
@@ -13,7 +13,7 @@ The [official documentation](https://kubernetes.io/docs/concepts/cluster-adminis
  chapter of this guide.
 * **Ingress** & Egress communication -- getting the traffic in and out of the Kubernetes cluster, discussed in the [Ingress & Egress](/ingress/) chapter of this guide.
 
-In addition to the above, there are a number of auxiliary problems that are covered in separate chapter of this guide:
+In addition to the above, there are a number of auxiliary problems that are covered in their separate chapters:
 
 * **Network Policies** -- a way to filter traffic going to and from Pods.
 * **DNS** -- the foundation of cluster service discovery.

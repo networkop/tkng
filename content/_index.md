@@ -4,9 +4,9 @@ title: "The Kubernetes Networking Guide"
 
 # The Kubernetes Networking Guide
 
-The purpose of this website is to provide an overview of various **Kubernetes networking components** with specific focus on **exactly how** they implement the required functionality. 
+The purpose of this website is to provide an overview of various **Kubernetes networking components** with a specific focus on **exactly how** they implement the required functionality. 
 
-The information here can be used for educational purposes, however the main goal is to provide a single point of reference for designing, operating and troubleshooting cluster networking solutions.
+The information here can be used for educational purposes, however, the main goal is to provide a single point of reference for designing, operating and troubleshooting cluster networking solutions.
 
 {{% notice warning %}}
 This is not a generic Kubernetes learning resource. The assumption is that the reader is already familiar with basic concepts and building blocks of a Kubernetes cluster -- pods, deployments, services. 
@@ -22,7 +22,7 @@ The guide is split into multiple parts which can be studied mostly independently
 {{% /children  %}}
 
 {{% notice info %}}
-**Why this structure?** -- To explain Kubernetes from a network-centric view in a language understandable to people with traditional network engineering background. This structure is also based on how [#sig-network](https://github.com/kubernetes/community/tree/master/sig-network) is organised into interest groups.
+**Why this structure?** -- To explain Kubernetes from a network-centric view in a language understandable to people with a traditional network engineering background. This structure is also based on how [#sig-network](https://github.com/kubernetes/community/tree/master/sig-network) is organised into interest groups.
 {{% /notice %}}
 
 
