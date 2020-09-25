@@ -7,6 +7,9 @@ DEFAULT: local
 local: 
 	${HUGO} server -D
 
+release:
+	git push
+	
 chapter:
 	hugo new --kind chapter newchapter/_index.md
 

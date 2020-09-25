@@ -1,19 +1,20 @@
 baseURL = "http://k8s.networkop.co.uk/"
 languageCode = "en-us"
-title = "Kubernetes Networking Guide"
+title = "The Kubernetes Networking Guide"
 theme = "hugo-theme-learn"
 
+googleAnalytics = "UA-31517751-3"
 
 [outputs]
 home = [ "HTML", "RSS", "JSON"]
 
 
 [params]
-    description = "The Ultimate Kubernetes Networking Guide"
+    description = "The Kubernetes Networking Guide"
     showVisitedLinks = false
     disableLanguageSwitchingButton = true
     disableMermaid = true
-    editURL = "https://github.com/networkop/k8s-networking-guide/content/"
+    editURL = "https://github.com/networkop/k8s-networking-guide/tree/master/content"
     disableInlineCopyToClipBoard = true
 
 
