@@ -21,7 +21,7 @@ There are a number of [reference](https://github.com/containernetworking/plugins
 * **macvlan/ipvlan** -- use the corresponding drivers to connect containers directly to the NIC of the Node. 
 
 {{% notice info %}}
-These reference plugins are very often combined and re-used by other, more complicated CNI plugins (see [kindnet](/cni/11-kindnet/) or [flannel](/cni/12-flannel)).
+These reference plugins are very often combined and re-used by other, more complicated CNI plugins (see [kindnet](/cni/kindnet/) or [flannel](/cni/flannel)).
 {{% /notice %}}
 
 Reachability, on the other hand, may require a bit of unpacking:
