@@ -24,6 +24,11 @@ Despite their orthogonality, each layer builds on top of abstractions provided b
 * **Ingress** -- associates a URL with a backend Service, learns the associated Endpoints and sends the traffic to one of the PodIPs, relying on the Pod-to-Pod connectivity.
 * **Service** -- performs the client-side load-balancing on the originating Node and sends the traffic to the destination PodIP, effectively relying on the Node-to-Pod connectivity.
 
+Here's an example of how different Kubernetes Resources are stacked together to provide a **North-South** connectivity:
+
+{{< iframe "https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&hide-pages=1&editable=false&layers=1&nav=0&page-id=ydZ7vDq7JmuY7Tl_GMgH&title=k8s-guide.drawio#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fnetworkop%2Fk8s-guide-labs%2Fmaster%2Fdiagrams%2Fk8s-guide.drawio" >}}
+
+
 {{% notice note %}}
 The main point is that Kubernetes Networking is not just a CNI or kube-proxy or Ingress controller. It's all of the above working in unison to provide a consistent network abstraction for hosted applications and external users.
 {{% /notice %}}
