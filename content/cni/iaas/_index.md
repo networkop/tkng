@@ -106,3 +106,15 @@ default via 172.16.0.1 dev eth0
 {{% notice info %}}
 Azure Nodes can also be configured with ["Azure CNI"](https://docs.microsoft.com/en-us/azure/aks/configure-azure-cni) where Pod IPs get allocated from the same range as the underlying VNET.
 {{% /notice %}}
+
+
+### EKS
+
+EKS takes a slightly different approach and runs as special [AWS CNI plugin](https://github.com/aws/amazon-vpc-cni-k8s) as a daemonset on all nodes. The functionality of this plugin is documented in the [proposal](https://github.com/aws/amazon-vpc-cni-k8s/blob/master/docs/cni-proposal.md) in a lot of detail. 
+
+{{% notice info %}}
+The VPC-native routing is achieved by assigning each Node's ENI with secondary IPs, and adding more ENIs as the max number of IPs per ENI [limit](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#AvailableIpPerENI) is exceeded.
+{{% /notice %}}
+
+
+One thing worse mentioning here is that in EKS's case, it's possible to replace the AWS CNI plugin with a number of [3rd party plugins](https://docs.aws.amazon.com/eks/latest/userguide/alternate-cni-plugins.html). In this case, VPC-native routing is not available since VPC virtual router won't be aware of the PodCIDRs and the only option is to run those plugins in the overlay mode -- by building a full-mesh of VXLAN tunnels and routes that forward traffic over them.

@@ -172,5 +172,6 @@ Chain POSTROUTING (policy ACCEPT 327 packets, 20536 bytes)
 
 ### Caveats and Gotchas
 
+* The official [installation manifest](https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml) does not install the CNI binary by default. This binary is distributed as a part of [reference CNI plugins](https://github.com/containernetworking/plugins/releases) and needs to be installed separately.
 * flannel can run in a `direct routing` mode, which acts by installing static routes for hosts on the same subnet.
 * flannel can use generic UDP encapsulation instead of VXLAN
