@@ -24,6 +24,10 @@ One notable difference with `kubenet` is that there is no daemon component in th
 
 {{< iframe "https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&hide-pages=1&editable=false&layers=1&nav=0&page-id=A5cMEZUylDs-XIrDOgQv&title=k8s-guide.drawio#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fnetworkop%2Fk8s-guide-labs%2Fmaster%2Fdiagrams%2Fk8s-guide.drawio" >}}
 
+{{% notice note %}}
+If you're interested in using BGP to establish reachability in cloud environment, be sure to check out [cloudroutesync](https://github.com/networkop/cloudroutesync).
+{{% /notice  %}}
+
 
 ### GKE
 
