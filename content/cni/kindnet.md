@@ -106,7 +106,7 @@ kubectl exec -it net-tshoot-x6wv9 -- ip route get 10.244.0.5
 local 10.244.0.5 dev lo src 10.244.0.5 uid 0 
 ```
 
-### Extra functionality
+### SNAT functionality
 
 In addition to the main CNI functionality, `kindnet` also sets up a number of IP masquerade (Source NAT) rules. These rules allow Pods to access the same networks as the hosting Node (e.g. Internet). The new `KIND-MASQ-AGENT` chain is inserted into the NAT's `POSTROUTING` chain and includes a special `RETURN` rule to exclude all traffic in the cluster-cidr range (10.244.0.0/16):   
 

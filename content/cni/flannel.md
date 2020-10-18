@@ -156,9 +156,9 @@ $ kubectl exec -it net-tshoot-rkg46 -- ip route get 10.244.0.2
 local 10.244.0.2 dev lo src 10.244.0.2 uid 0
 ```
 
-### Extra functionality
+### SNAT functionality
 
-Similar to [kindnet](/cni/kindnet/) `flanneld` sets up the SNAT rules to enable egress connectivity from the Pods, the only difference is that it does it inside the `POSTROUTING` chain:
+Similar to [kindnet](/cni/kindnet/) `flanneld` sets up the SNAT rules to enable egress connectivity for the Pods, the only difference is that it does this directly inside the `POSTROUTING` chain:
 
 ```
 Chain POSTROUTING (policy ACCEPT 327 packets, 20536 bytes)
