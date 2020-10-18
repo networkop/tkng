@@ -22,7 +22,7 @@ Although it would have been possible to attach containers directly to the OVS da
 
 
 {{% notice info %}}
-As an extra bonus for using OVS and overlays, Weave supports multicast without having to integrate it with the physical underlay network.
+The cluster-wide CIDR range is still split into multiple non-overlapping ranges, which may look like a node-local pod CIDRs, however all Pod IPs still have the same prefix length as the cluster CIDR, effectively making them part of a single L3 subnet.
 {{% /notice %}}
 
 
