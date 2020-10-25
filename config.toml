@@ -14,7 +14,7 @@ home = [ "HTML", "RSS", "JSON"]
     showVisitedLinks = false
     disableLanguageSwitchingButton = true
     disableMermaid = true
-    editURL = "https://github.com/networkop/k8s-networking-guide/tree/master/content"
+    editURL = "https://github.com/networkop/k8s-networking-guide/tree/master/content/"
     disableInlineCopyToClipBoard = true
 
 
