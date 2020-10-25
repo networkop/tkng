@@ -244,6 +244,78 @@ Chain WEAVE (1 references)
 ```
 
 
+### Partial connectivity
+
+One of the interesting and unique features of Weave is its ability to function in environments with partial connectiity. This functionality is enabled by [Weave Mesh](https://github.com/weaveworks/mesh) and its use of the [gossip protocol](https://en.wikipedia.org/wiki/Gossip_protocol), allowing mesh members to dynamically discover each other and build the topology graph which is used to calculate the most optimal forwarding path. 
+
+One way to demonstrate this is to break the connectivity between the worker nodes and verify that pods are still able to reach each other. Let's start by checking that ping works under normal conditions:
+
+```
+POD_WORKER2_IP=$(kubectl get pods -n default --field-selector spec.nodeName=k8s-guide-worker2 -o jsonpath='{.items[0].status.podIP}')
+POD_WORKER1_NAME=$(kubectl get pods -n default --field-selector spec.nodeName=k8s-guide-worker -o jsonpath='{.items[0].metadata.name}')
+kubectl -n default exec $POD_WORKER1_NAME -- ping -q -c 5 $POD_WORKER2_IP 
+PING 10.40.0.7 (10.40.0.7) 56(84) bytes of data.
+
+--- 10.40.0.7 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4055ms
+rtt min/avg/max/mdev = 0.136/0.178/0.278/0.051 ms
+```
+
+Get the IPs of the two worker nodes:
+
+```
+IP_WORKER1=$(docker inspect k8s-guide-worker --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+IP_WORKER2=$(docker inspect k8s-guide-worker2 --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}')
+```
+
+Add a new `DROP` rule for the traffic between these two IPs:
+
+```
+sudo iptables -I FORWARD -s $IP_WORKER1 -d $IP_WORKER2 -j DROP
+```
+
+A few seconds later, once the control plane has reconverged, repeate the ping from the first step:
+
+```
+kubectl -n default exec $POD_WORKER1_NAME -- ping -q -c 5 $POD_WORKER2_IP 
+
+PING 10.40.0.7 (10.40.0.7) 56(84) bytes of data.
+
+--- 10.40.0.7 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4031ms
+rtt min/avg/max/mdev = 0.347/0.489/0.653/0.102 ms
+
+```
+
+The connectivity still works, although the traffic between the two worker nodes is definitely dropped:
+
+```
+sudo iptables -nvL FORWARD | grep DROP
+Chain FORWARD (policy DROP 0 packets, 0 bytes)
+  312 43361 DROP       all  --  *      *       172.18.0.5           172.18.0.4     
+```
+
+One thing worth noting here is that the average RTT has almost doubled compared to the original test. This is because the traffic is now relayed by the control-plane node - the only node that has full connectivity to both worker nodes. At the dataplane, this is achieved with a special UDP-based protocol called sleeve(https://www.weave.works/docs/net/latest/concepts/router-encapsulation/). 
+
+
+The sending node (172.18.0.5) encapsulates ICMP packets for the other worker node (172.18.0.4) in a Sleeve payload and sends them to the control-plane node (172.18.0.2), which relays them on to the correct destination:
+
+
+```
+12:28:54.056814 IP 172.18.0.5.48052 > 172.18.0.2.6784: UDP, length 106
+12:28:54.057599 IP 172.18.0.2.48052 > 172.18.0.4.6784: UDP, length 106
+12:28:54.057957 IP 172.18.0.4.48052 > 172.18.0.2.6784: UDP, length 106
+12:28:54.058376 IP 172.18.0.2.48052 > 172.18.0.5.6784: UDP, length 106
+```
+
+
+Don't forget to remove the drop rule at the end of the testing:
+
+```
+sudo iptables -D FORWARD -s $IP_WORKER1 -d $IP_WORKER2 -j DROP
+```
+
+
 ### Caveats and Gotchas
 
 * The official installation guide contains a number of [things to watch out for](https://www.weave.works/docs/net/latest/kubernetes/kube-addon/#-things-to-watch-out-for).
