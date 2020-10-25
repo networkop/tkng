@@ -5,24 +5,24 @@ date: 2020-10-17T12:33:04+01:00
 weight: 14
 ---
 
-[Weave Net](https://www.weave.works/docs/net/latest/overview/) is one of the "heavyweight" CNI plugins with a wide range of features and its own separate contorl plane to disseminate routing information between nodes. The scope of the plugin extends far beyond the base CNI functionality examined in this chapter and includes Network Policies, Encryption, Multicast and support for other container orchestration platforms (Swarm, Mesos). 
+[Weave Net](https://www.weave.works/docs/net/latest/overview/) is one of the "heavyweight" CNI plugins with a wide range of features and its own proprietary control plane to disseminate routing information between nodes. The scope of the plugin extends far beyond the base CNI functionality examined in this chapter and includes Network Policies, Encryption, Multicast and support for other container orchestration platforms (Swarm, Mesos). 
 
 Following a similar pattern, let's examine how `weave` achieves the base CNI plugin functionality:
 
-* **Connectivity** is setup by the `weave-net` binary by attaching all pods to the `weave` Linux bridge. The bridge is, in turn, attached to the Open vSwitch's kernel datapath which forwards the packets over the vxlan interface towards the target node.
+* **Connectivity** is set up by the `weave-net` binary by attaching pods to the `weave` Linux bridge. The bridge is, in turn, attached to the Open vSwitch's kernel datapath which forwards the packets over the vxlan interface towards the target node.
 
 {{% notice info %}}
 Although it would have been possible to attach containers directly to the OVS datapath (ODP), Linux bridge plays the role of an egress router for all local pods so that ODP is only used for pod-to-pod forwarding.
 {{% /notice %}}
 
-* **Reachability** is establish by two separate mechanisms:
+* **Reachability** is established by two separate mechanisms:
 
     1. [Weave Mesh](https://github.com/weaveworks/mesh) helps agents discover each other, check health, connectivity and exchange node-local details, e.g. IPs for VXLAN tunnel endpoint.
     2. OVS datapath acts as a standard learning L2 switch with flood-and-learn behaviour being [programmed](https://github.com/weaveworks/go-odp) by the local agent (based on information distributed by the Mesh). All pods get their IPs from a single cluster-wide subnet and see their peers as if they were attached to a single broadcast domain.
 
 
 {{% notice info %}}
-The cluster-wide CIDR range is still split into multiple non-overlapping ranges, which may look like a node-local pod CIDRs, however all Pod IPs still have the same prefix length as the cluster CIDR, effectively making them part of a single L3 subnet.
+The cluster-wide CIDR range is still split into multiple non-overlapping ranges, which may look like a node-local pod CIDRs, however, all Pod IPs still have the same prefix length as the cluster CIDR, effectively making them part of the same L3 subnet.
 {{% /notice %}}
 
 
@@ -84,7 +84,7 @@ default via 172.18.0.1 dev eth0
 172.18.0.0/16 dev eth0 proto kernel scope link src 172.18.0.4 
 ```
 
-3. ODP configuration and flows (ouput ommited for brevity)
+3. ODP configuration and flows (output omitted for brevity)
 
 
 ```
@@ -246,9 +246,9 @@ Chain WEAVE (1 references)
 
 ### Partial connectivity
 
-One of the interesting and unique features of Weave is its ability to function in environments with partial connectiity. This functionality is enabled by [Weave Mesh](https://github.com/weaveworks/mesh) and its use of the [gossip protocol](https://en.wikipedia.org/wiki/Gossip_protocol), allowing mesh members to dynamically discover each other and build the topology graph which is used to calculate the most optimal forwarding path. 
+One of the interesting and unique features of Weave is its ability to function in environments with partial connectivity. This functionality is enabled by [Weave Mesh](https://github.com/weaveworks/mesh) and its use of the [gossip protocol](https://en.wikipedia.org/wiki/Gossip_protocol), allowing mesh members to dynamically discover each other and build the topology graph which is used to calculate the most optimal forwarding path. 
 
-One way to demonstrate this is to break the connectivity between the worker nodes and verify that pods are still able to reach each other. Let's start by checking that ping works under normal conditions:
+One way to demonstrate this is to break the connectivity between two worker nodes and verify that pods are still able to reach each other. Let's start by checking that ping works under normal conditions:
 
 ```
 POD_WORKER2_IP=$(kubectl get pods -n default --field-selector spec.nodeName=k8s-guide-worker2 -o jsonpath='{.items[0].status.podIP}')
@@ -274,7 +274,7 @@ Add a new `DROP` rule for the traffic between these two IPs:
 sudo iptables -I FORWARD -s $IP_WORKER1 -d $IP_WORKER2 -j DROP
 ```
 
-A few seconds later, once the control plane has reconverged, repeate the ping from the first step:
+A few seconds later, once the control plane has reconverged, repeat the ping test:
 
 ```
 kubectl -n default exec $POD_WORKER1_NAME -- ping -q -c 5 $POD_WORKER2_IP 
@@ -295,7 +295,7 @@ Chain FORWARD (policy DROP 0 packets, 0 bytes)
   312 43361 DROP       all  --  *      *       172.18.0.5           172.18.0.4     
 ```
 
-One thing worth noting here is that the average RTT has almost doubled compared to the original test. This is because the traffic is now relayed by the control-plane node - the only node that has full connectivity to both worker nodes. At the dataplane, this is achieved with a special UDP-based protocol called sleeve(https://www.weave.works/docs/net/latest/concepts/router-encapsulation/). 
+One thing worth noting here is that the average RTT has almost doubled compared to the original test. This is because the traffic is now relayed by the control-plane node - the only node that has full connectivity to both worker nodes. In the dataplane, this is achieved with a special UDP-based protocol called sleeve(https://www.weave.works/docs/net/latest/concepts/router-encapsulation/). 
 
 
 The sending node (172.18.0.5) encapsulates ICMP packets for the other worker node (172.18.0.4) in a Sleeve payload and sends them to the control-plane node (172.18.0.2), which relays them on to the correct destination:
@@ -320,7 +320,7 @@ sudo iptables -D FORWARD -s $IP_WORKER1 -d $IP_WORKER2 -j DROP
 ### Caveats and Gotchas
 
 * The official installation guide contains a number of [things to watch out for](https://www.weave.works/docs/net/latest/kubernetes/kube-addon/#-things-to-watch-out-for).
-* Addition/Deletion or intermittent connectivity to nodes [results](https://github.com/weaveworks/weave/issues/3645) in flow invalidation on all nodes, which, for a brief period of time, disupts all connections until the flood-and-learn re-populates all forwarding tables.
+* Addition/Deletion or intermittent connectivity to nodes [results](https://github.com/weaveworks/weave/issues/3645) in flow invalidation on all nodes, which, for a brief period of time, disrupts all connections until the flood-and-learn re-populates all forwarding tables.
 
 
 
