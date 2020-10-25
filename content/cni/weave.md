@@ -308,6 +308,7 @@ The sending node (172.18.0.5) encapsulates ICMP packets for the other worker nod
 12:28:54.058376 IP 172.18.0.2.48052 > 172.18.0.5.6784: UDP, length 106
 ```
 
+Although it certainly comes with substantial performance trade-offs, this functionality can become very handy in environments with bad network links or where remote nodes are hosted in an isolated network environment with limited/restricted external connectivity.
 
 Don't forget to remove the drop rule at the end of the testing:
 
