@@ -121,4 +121,4 @@ The VPC-native routing is achieved by assigning each Node's ENI with secondary I
 {{% /notice %}}
 
 
-One thing worse mentioning here is that in EKS's case, it's possible to replace the AWS CNI plugin with a number of [3rd party plugins](https://docs.aws.amazon.com/eks/latest/userguide/alternate-cni-plugins.html). In this case, VPC-native routing is not available since VPC virtual router won't be aware of the PodCIDRs and the only option is to run those plugins in the overlay mode -- by building a full-mesh of VXLAN tunnels and routes that forward traffic over them.
+One thing worth mentioning here is that in EKS's case, it's possible to replace the AWS CNI plugin with a number of [3rd party plugins](https://docs.aws.amazon.com/eks/latest/userguide/alternate-cni-plugins.html). In this case, VPC-native routing is not available since VPC virtual router won't be aware of the PodCIDRs and the only option is to run those plugins in the overlay mode -- by building a full-mesh of VXLAN tunnels and static routes that forward traffic over them.
