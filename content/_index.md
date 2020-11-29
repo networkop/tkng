@@ -36,7 +36,7 @@ Where possible, every topic in this guide will include a dedicated hands-on lab 
 If you found an error or want to add something to this guide, just click the **Edit this page** link displayed on top right of each page (except this one), and submit a pull request.
 
 {{% notice note %}}
-When submitting a brand new content, please make an effort to add a corresponding lab to the [Labs repo](https://github.com/networkop/k8s-guide-labs)
+When submitting brand new content, please consider adding a corresponding lab to the [Labs repo](https://github.com/networkop/k8s-guide-labs)
 {{% /notice %}}
 
 
