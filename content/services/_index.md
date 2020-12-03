@@ -45,7 +45,7 @@ Although not directly connected, Services often rely on Deployments and Stateful
 Services have a relatively small and simple API. At the very least they expect the following to be defined:
 
 * Explicit list of backend **ports** that needs to be exposed.
-* Label **selector** to understand which Pods are the potential upstream candidates. 
+* Label **selector** to understand which Pods are potential upstream candidates. 
 * A Service **type** which defaults to `ClusterIP`.
 
 ```yaml
@@ -76,8 +76,4 @@ Another less critical, but nonetheless important components is DNS. Internally, 
 
 {{< iframe "https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&hide-pages=1&editable=false&layers=1&nav=0&page-id=HR_OWBqgmX47NSTQvTWL&title=k8s-guide.drawio#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fnetworkop%2Fk8s-guide-labs%2Fmaster%2Fdiagrams%2Fk8s-guide.drawio" >}}
 
-## Services Optimisations
 
-* externalTrafficPolicy
-* Topology-aware routing
-* EndpointSlices
