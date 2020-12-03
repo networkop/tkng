@@ -12,7 +12,7 @@ local:
 ## Push the latest commit upstream
 release:
 	git add .
-	git commit -m "$$(date +'%a %d %B %G') % $$(openssl rand -hex 2)"
+	git commit -m "$$(date)"
 	git push
 	
 ## Create a new chapter
@@ -27,6 +27,3 @@ help:
 # https://desk.draw.io/support/solutions/articles/16000042542-embed-html
 
 
-
-test:
-	@echo "$$(date +'%a %d %B %G') % $$(openssl rand -hex 2)"
