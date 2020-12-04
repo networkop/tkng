@@ -16,14 +16,14 @@ A lot of ideas and concepts in this chapter are based on numerous talks and pres
 A good starting point to understand a Kubernetes Service is to think of it as a distributed load-balancer. Similar to traditional load-balancers, its data model can be reduced to the following two components:
 
 1. **Grouping of backend Pods** -- all Pods with similar labels represent a single service and can receive and process incoming traffic for that service. 
-2. **Methods of exposure** -- each group of Pods can be exposed either internally, to other Pods in a cluster, or externally, to end users or external services in a number of different ways. 
+2. **Methods of exposure** -- each group of Pods can be exposed either internally, to other Pods in a cluster, or externally, to end-users or external services in many different ways. 
 
-All Services implement the above functionality, but each in a slightly different way, built for its own unqiue usecase. In order to understand various Service types, it helps to view them as an "hierarchy" -- starting from the simplest, with each subsequent type building on top of the previous one. The table below is an attempt to explore and explain this hierarchy:
+All Services implement the above functionality, but each in a slightly different way, built for its own unique use case. In order to understand various Service types, it helps to view them as a "hierarchy" -- starting from the simplest, with each subsequent type building on top of the previous one. The table below is an attempt to explore and explain this hierarchy:
 
 | Type      | Description | 
 | ----------| ----------- |
-| **Headless** | The simplest form of load-balancing involving only DNS. Nothing is programmed in the dataplane and no load-balancer VIP is assigned, however DNS query will return IPs for all backend Pods. The most typical use-case for this is stateful workloads (e.g. databases), where clients need stable and predictable DNS name and can handle loss of connectivity and failover on their own. |
-| **ClusterIP** | The most common type, assigns a unique ClusterIP (VIP) to a set of matching backend Pods. DNS lookup of a Service name returns the allocated ClusterIP. All ClusterIPs are configured in the dataplane of each node as DNAT rules -- destination ClusterIP is translated to one of the PodIPs. These NAT translations always happen on the egress (client-side) node which means that Node-to-Pod reachability must be provided externally (by a [CNI plugin](/cni)).  |
+| **Headless** | The simplest form of load-balancing involving only DNS. Nothing is programmed in the data plane and no load-balancer VIP is assigned, however DNS query will return IPs for all backend Pods. The most typical use-case for this is stateful workloads (e.g. databases), where clients need stable and predictable DNS name and can handle the loss of connectivity and failover on their own. |
+| **ClusterIP** | The most common type, assigns a unique ClusterIP (VIP) to a set of matching backend Pods. DNS lookup of a Service name returns the allocated ClusterIP. All ClusterIPs are configured in the data plane of each node as DNAT rules -- destination ClusterIP is translated to one of the PodIPs. These NAT translations always happen on the egress (client-side) node which means that Node-to-Pod reachability must be provided externally (by a [CNI plugin](/cni)).  |
 | **NodePort** | Builds on top of the ClusterIP Service by allocating a unique static port in the root namespace of each Node and mapping it (via Port Translation) to the port exposed by the backend Pods. The incoming traffic can hit _any_ cluster Node and, as long as destination port matches the NodePort, it will get forwarded to one of the healthy backend Pods. |
 | **LoadBalancer** |  Attracts external user traffic to a Kubernetes cluster. Each LoadBalancer Service instance is assigned with a unique, externally routable IP address which is advertised to the underlying physical network via BGP or gratuitous ARP. This Service type is implemented outside of the main kube controller -- either by the underlying cloud as an external L4 load-balancer or with a cluster add-on like [MetalLB](https://github.com/metallb/metall.) or [Porter](https://github.com/kubesphere/porter). |
 
@@ -37,7 +37,7 @@ The following diagram illustrates how different Service types can be combined to
 
 
 {{% notice info %}}
-Although not directly connected, Services often rely on Deployments and StatefulSets to create the required number of Pods with a unqiue set of labels. 
+Although not directly connected, Services often rely on Deployments and StatefulSets to create the required number of Pods with a unique set of labels. 
 {{% /notice %}}
 
 ## Service APIs and Implementation
@@ -69,7 +69,7 @@ Some services may not have any label selectors, in which case the list of backen
 
 Service's internal architecture consists of two loosely-coupled components:
 
-* Kubernetes **control plane** -- internal controller running inside the `kube-controller-manager` binary, that react to API events and builds internal representation of each service instance. This internal representation is a special **Endpoints** object that gets created for every Service instance and contains a list of healthy backend endpoints (PodIP + port).
+* Kubernetes **control plane** -- internal controller running inside the `kube-controller-manager` binary, that react to API events and builds an internal representation of each service instance. This internal representation is a special **Endpoints** object that gets created for every Service instance and contains a list of healthy backend endpoints (PodIP + port).
 * Distributed **data plane** --  a set of Node-local agents that read **Endpoints** objects and program their local data plane. This is most commonly implemented with `kube-proxy` with various competing implementations from 3rd-party Kubernetes networking providers like Cilium, Calico, kube-router and others.
 
 Another less critical, but nonetheless important components is DNS. Internally, DNS add-on is just a Pod running in a cluster that caches `Service` and `Endpoints` objects and responds to incoming queries according to the DNS-Based Service Discovery [specification](https://github.com/kubernetes/dns/blob/master/docs/specification.md), which defines the format for incoming queries and the expected structure for responses.
