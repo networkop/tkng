@@ -64,7 +64,7 @@ spec:
 ```
 
 {{% notice note %}}
-Some services may not have any label selectors, in which case the list of backend Pods can still be constructed manually. 
+Some services may not have any label selectors, in which case the list of backend Pods can still be constructed manually. This is often used to interconnect with services outside of the Kubernetes cluster while still relying on internal mechanisms of service discovery.
 {{% /notice %}}
 
 Service's internal architecture consists of two loosely-coupled components:
