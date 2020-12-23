@@ -11,7 +11,7 @@ weight: 16
 * **Connectivity** is set up by creating a `veth` link and moving one side of that link into a Pod's namespace. The other side of the link is left dangling in the node's root namespace. Cilium attaches eBPF programs to ingress TC hooks of these links in order to intercept all incoming packets for further processing.
 
 {{% notice note %}}
-One thing to note is that `veth` links in the root namespace do not have any IP address configured and most of the network connectivity and fowarding is performed within eBPF programs.
+One thing to note is that `veth` links in the root namespace do not have any IP address configured and most of the network connectivity and forwarding is performed within eBPF programs.
 {{% /notice %}}
 
 * **Reachability** is implemented differently, depending on Cilium's configuration:
@@ -53,7 +53,7 @@ Now we need to "kick" all Pods to restart and pick up the new CNI plugin:
 make nuke-all-pods
 ```
 
-To make sure there's is no interference from `kube-proxy` all iptables NAT rules neet to be flushed:
+To make sure there's is no interference from `kube-proxy` all iptables NAT rules need to be flushed:
 
 ```
 make flush-nat 
@@ -75,7 +75,7 @@ default via 10.0.0.215 dev eth0 mtu 1450
 10.0.0.215 dev eth0 scope link 
 ```
 
-Default route has its nexthop statically pinned to `eth0@if24`, which is also where ARP requests are sent:
+The default route has its nexthop statically pinned to `eth0@if24`, which is also where ARP requests are sent:
 
 ```
 bash-5.0# ip neigh
@@ -181,7 +181,7 @@ arp_respond(struct __ctx_buff *ctx, union macaddr *smac, __be32 sip,
 }
 ```
 
-As is the case with all of the stateless ARP responders, reply is crafted out of the original packet by swapping some of the fields while populating the other ones with well-known information (e.g. source MAC):
+As is the case with all of the stateless ARP responders, a reply is crafted out of the original packet by swapping some of the fields while populating the other ones with well-known information (e.g. source MAC):
 
 ```c
 arp_prepare_response(struct __ctx_buff *ctx, union macaddr *smac, __be32 sip,
@@ -453,12 +453,12 @@ The result contains one important value which will be used later to build an out
 
 6. All encapsulation-related functions are defined inside [`cilium/bpf/lib/encap.h`](https://github.com/cilium/cilium/blob/v1.9.1/cilium/bpf/lib/encap.h) and the packet gets [VXLAN-encapsulated](https://github.com/cilium/cilium/blob/v1.9.1/bpf/lib/encap.h#L136) and [XDP-redirected](https://github.com/cilium/cilium/blob/v1.9.1/bpf/lib/encap.h#L153) straight to the egress VXLAN interface.
 
-7. At this point the packet has all the necessary headers and is delivered to the ingress Node by the underlay (in our case it's docker linux bridge).
+7. At this point the packet has all the necessary headers and is delivered to the ingress Node by the underlay (in our case it's docker's Linux bridge).
 
 
 #### 5. eBPF packet processing on ingress Node
 
-1. Once VXLAN packet reaches the target Node, it triggers another eBPF hook:
+1. Once the VXLAN packet reaches the target Node, it triggers another eBPF hook:
 
 ```
 kubectl -n cilium exec $cilium3 -- bpftool net show | grep vxlan
@@ -515,7 +515,7 @@ The value gets read into the [`endpoint_info`](https://github.com/cilium/cilium/
 
 ### SNAT functionality
 
-Although Cilium supports eBPF-based masquerading, in the current lab this functionality had to be disabled due its reliance on the [Host-Reachable Service](https://docs.cilium.io/en/v1.9/gettingstarted/host-services/#host-services) feature which is [known](https://docs.cilium.io/en/v1.9/gettingstarted/kind/#troubleshooting) to have problems with kind.
+Although Cilium supports eBPF-based masquerading, in the current lab this functionality had to be disabled due to its reliance on the [Host-Reachable Service](https://docs.cilium.io/en/v1.9/gettingstarted/host-services/#host-services) feature which is [known](https://docs.cilium.io/en/v1.9/gettingstarted/kind/#troubleshooting) to have problems with kind.
 
 In our case Cilium falls back to traditional IPTables-based masquerading of external traffic:
 
@@ -530,7 +530,7 @@ Chain CILIUM_POST_nat (1 references)
 ### Caveats and Gotchas
 
 * Cilium's kubeproxy-free functionality depends on recent Linux kernel versions and contains a number of known [limitations](https://docs.cilium.io/en/v1.9/gettingstarted/kubeproxy-free/#limitations).
-* Since eBPF programs get loaded into kernel, simulating a cluster on a shared kernel (e.g. with kind) may lead to unexpected issues. For full functionality testing it is recommended to run each node in a dedicated VM, e.g. with something like [Firecracker](https://github.com/firecracker-microvm/firecracker) and [Ignite](https://github.com/weaveworks/ignite).
+* Since eBPF programs get loaded into the kernel, simulating a cluster on a shared kernel (e.g. with kind) may lead to unexpected issues. For full functionality testing, it is recommended to run each node in a dedicated VM, e.g. with something like [Firecracker](https://github.com/firecracker-microvm/firecracker) and [Ignite](https://github.com/weaveworks/ignite).
 
 
 
