@@ -31,7 +31,7 @@ Some **optional extras** that may make your life a lot easier:
 
 ## Supported Operating Systems
 
-The main supported operating system is **Linux**. The kernel version is can be anything that's `>=4.19`.
+The main supported operating system is **Linux**. The kernel version can be anything that's `>=4.19`.
 
 {{% notice note %}}
 Most of the things should also be supported on Darwin. If you find a discrepancy and know how to fix it, please submit a PR.
