@@ -11,12 +11,13 @@ All labs are stored in a separate Github repository -- [k8s-guide-labs](https://
 
 ## Prerequisites
 
-In order to interact with the labs, the following set of tools need to be pre-installed:
+In order to interact with the lab, the following set of tools need to be pre-installed:
 
 * **Docker** with `containerd` runtime. This is what you get by default when you install [docker-ce](https://docs.docker.com/engine/install/).
 * **kubectl** to interact with a Kubernetes cluster. Installation instructions can be found [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 * **helm** to bootstrap the cluster with Flux. Installation instructions can be found [here](https://github.com/helm/helm#install)
 * **make** is used to automate and orchestrate manual tasks. Most instructions will be provided as a series of make commands.
+
 
 {{% notice info %}}
 A number of additional tools (e.g. kind) will be installed automatically during the Setup phase
@@ -28,6 +29,8 @@ Some **optional extras** that may make your life a lot easier:
 * [kubens/kubectx](https://github.com/ahmetb/kubectx) to easily switch between namespaces and contexts.
 * [stern](https://github.com/wercker/stern) to read logs from multiple Pods at the same time.
 * [k9s](https://github.com/derailed/k9s) is a very convinient terminal dashboard for a Kubernetes cluster.
+
+Installation instructions will depend on the operating system. Here's an example [bash bootstrap script](https://gist.github.com/hellt/61242c680c78c3c813f20ecb9577a93e) for Ubuntu 20.4 LTS x86_64.
 
 ## Supported Operating Systems
 
