@@ -34,7 +34,7 @@ Installation instructions will depend on the operating system. Here's an example
 
 ## Supported Operating Systems
 
-The main supported operating system is **Linux**. The kernel version is can be anything that's `>=4.19`.
+The main supported operating system is **Linux**. The kernel version can be anything that's `>=4.19`.
 
 {{% notice note %}}
 Most of the things should also be supported on Darwin. If you find a discrepancy and know how to fix it, please submit a PR.
