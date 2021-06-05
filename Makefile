@@ -1,5 +1,5 @@
 # That's because i have two hugo versions
-HUGO := hugo-latest
+HUGO := hugo-0.74.3
 
 RANDOM_STR = 
 
@@ -7,7 +7,7 @@ DEFAULT: local
 
 ## Start a local server
 local: 
-	${HUGO} server -D
+	${HUGO} server -D --bind 0.0.0.0
 
 ## Push the latest commit upstream
 release:
