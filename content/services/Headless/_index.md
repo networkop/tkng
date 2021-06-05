@@ -2,7 +2,7 @@
 title: "Headless"
 date: 2020-09-13T17:33:04+01:00
 weight: 30
-draft: true 
+draft: false 
 ---
 
 This type of service does not perform any load-balancing and only implements DNS Service Discovery, based on the Kubernetes [DNS Spec](https://github.com/kubernetes/dns/blob/master/docs/specification.md#24---records-for-a-headless-service). Although this is the simplest and the most basic type of Service, its use is mainly limited to stateful applications like databases and clusters. In these use case the assumption is that clients have some prior knowledge about the application they're going to be communicating with, e.g. number of nodes, naming structure, and can handle failover and load-balancing on their own.
