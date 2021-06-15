@@ -9,7 +9,7 @@ Let's start our explanation with the first stage of any Kubernetes cluster lifec
 For the simplicity we'll assume `kubeadm` is used to orchestrate a cluster.
 {{% /notice %}}
 
-This setting is ultimately used as an `service-cluster-ip-range` argument of the `kube-apiserver` Pods. Orchestrators will suggest a default value for this range (e.g. `10.96.0.0/12`) which most of the times is safe to use, as we'll see later, this range is completely "virtual", i.e. does not need to have any coordination with the underlying network and can be re-used between clusters (one notable exception being [this Calico feature](https://docs.projectcalico.org/networking/advertise-service-ips#advertise-service-cluster-ip-addresses)). The only constraints are:
+This setting is ultimately used as a `service-cluster-ip-range` argument of the `kube-apiserver`. Orchestrators will suggest a default value for this range (e.g. `10.96.0.0/12`) which most of the times is safe to use. As we'll see later, this range is completely "virtual", i.e. does not need to have any coordination with the underlying network and can be re-used between clusters (one notable exception being [this Calico feature](https://docs.projectcalico.org/networking/advertise-service-ips#advertise-service-cluster-ip-addresses)). The only constraints are:
 
 - It must not overlap with any of the Pod IP ranges or Node IPs of the same cluster.
 - It must not be loopback (127.0.0.0/8 for IPv4, ::1/128 for IPv6) or link-local (169.254.0.0/16 and 224.0.0.0/24 for IPv4, fe80::/64 for IPv6).
