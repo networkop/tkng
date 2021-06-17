@@ -19,9 +19,9 @@ spec:
     app: my-backend-app
 ```
 
-Quite unexpectedly, these 5 lines can generate a large amount of state inside the cluster as each Service has to be implemented on all worker nodes and its state grows prortionally to the number of backend Endpoints. In order to better understand the mechanisms behind it, the remainder of this chapter will be broken down into the following sections:
+Quite unexpectedly, these 5 lines can generate a large amount of state inside the cluster as each Service has to be implemented on all nodes and its state grows prortionally to the number of backend Endpoints. In order to better understand the networking behind it, the remainder of this chapter will be broken down into the following sections:
 
-- **Control Plane** will examine the mechanics of interaction between user input, the API server and distributed node-local agents.
-- **Data Plane** will cover some of the standard implementations, including iptables, ipvs and eBPF.
-- **Optimisations** will look at how control plane can be tuned to provide better scalability.
+- **Control Plane** will examine the mechanics of interaction between the user input, the API server processing it and a distributed set of node-local agents ultimately consuming it.
+- **Data Plane** will cover some of the standard implementations including iptables, ipvs and eBPF.
+- **Optimisations** will look at how control plane can be tuned to provide better scalability and performance.
 
