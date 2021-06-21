@@ -4,7 +4,7 @@ date: 2020-09-13T17:33:04+01:00
 weight: 10
 ---
 
-Most of the focus of this section will be on the standard node-local proxy implementation called  [`kube-proxy`](https://kubernetes.io/docs/concepts/overview/components/#kube-proxy). It is used by default by most of the Kubernetes orchestrators and is installed as a daemonset on top of a cluster:
+Most of the focus of this section will be on the standard node-local proxy implementation called  [`kube-proxy`](https://kubernetes.io/docs/concepts/overview/components/#kube-proxy). It is used by default by most of the Kubernetes orchestrators and is installed as a daemonset on top of an newly bootstrapped cluster:
 
 
 ```
@@ -15,7 +15,7 @@ kube-proxy   3         3         3       3            3           kubernetes.io/
 
 The default mode of operation for `kube-proxy` is `iptables`, as it provides support for a wider set of operating systems without requiring extra kernel modules and has a "good enough" performance characteristics for the majority of small to medium-sized clusters. 
 
-This area of Kubernetes networking is one of the most poorly documented. On the one hand, there are [blogposts](https://medium.com/google-cloud/understanding-kubernetes-networking-services-f0cb48e4cc82) that cover parts of the `kube-proxy` dataplane, on the other hand there's an amazing [diagram](https://docs.google.com/drawings/d/1MtWL8qRTs6PlnJrW4dh8135_S9e2SaawT410bJuoBPk/edit) created by [Tim Hockin](https://twitter.com/thockin) that shows a complete logical flow of packet forwarding decisions but provides very little context and is quite difficult to trace for specific flows. The goal of this article to bridge the gap between these two extremes and provide a high level of detail while maintaining an easily consumable format.
+This area of Kubernetes networking is one of the most poorly documented. On the one hand, there are [blogposts](https://medium.com/google-cloud/understanding-kubernetes-networking-services-f0cb48e4cc82) that cover parts of the `kube-proxy` dataplane, on the other hand there's an amazing [diagram](https://docs.google.com/drawings/d/1MtWL8qRTs6PlnJrW4dh8135_S9e2SaawT410bJuoBPk/edit) created by [Tim Hockin](https://twitter.com/thockin) that shows a complete logical flow of packet forwarding decisions but provides very little context and is quite difficult to trace for specific flows. The goal of this article is to bridge the gap between these two extremes and provide a high level of detail while maintaining an easily consumable format.
 
 So for demonstration purposes, we'll use the following topology with a "web" deployment and two pods scheduled on different worker nodes. The packet forwarding logic for ClusterIP-type services has two distinct paths within the dataplane, which is what we're gonna be focusing on next:
 
@@ -24,6 +24,12 @@ So for demonstration purposes, we'll use the following topology with a "web" dep
 
 {{< iframe "https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&hide-pages=1&editable=false&layers=1&nav=0&page-id=nEL34B1qbs_s_G34E68V&title=k8s-guide.drawio#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fnetworkop%2Fk8s-guide-labs%2Fmaster%2Fdiagrams%2Fk8s-guide.drawio" >}}
 
+
+The above diagram shows a slightly simplified sequence of match/set actions implemented inside Netfilter's NAT table. The lab section below will show a more detailed view of this dataplane along verification commands.
+
+{{% notice note %}}
+One key thing to remember is that none of the ClusterIPs implemented this way are visible in the Linux routing table. The whole dataplane is implemented entirely within iptable's NAT table, which makes it both very flexible and extremely difficult to troubleshoot at the same time.
+{{% /notice %}}
 
 ### Lab Setup
 
@@ -136,7 +142,7 @@ Chain KUBE-MARK-MASQ (19 references)
 
 Since `MARK` is not a [terminating target](https://gist.github.com/mcastelino/c38e71eb0809d1427a6650d843c42ac2#targets), the lookup continues down the `KUBE-SERVICES` chain where our packets gets DNAT'ed to one of the randomly selected backend endpoints (as shown above). 
 
-However, this time, before it gets sent to its final destination, the packet gets another de-tour via the `KUBE-POSTROUTING` chain:
+However, this time, before it gets sent to its final destination, the packet gets another detour via the `KUBE-POSTROUTING` chain:
 
 
 {{< highlight bash "linenos=false,hl_lines=4" >}}
@@ -160,9 +166,15 @@ Chain KUBE-POSTROUTING (1 references)
 {{< / highlight >}}
 
 
-The final `MASQUERADE` action ensures that the return packet follow the same way back, even if it was originated from outside of the Kubernetes cluster.
+The final `MASQUERADE` action ensures that the return packets follow the same way back, even if they were originated from outside of the Kubernetes cluster.
 
-### Addional Reading
+{{% notice info %}}
+The above sequence of lookups may look long an inefficient but bear in mind that this is only done once, for the first packet of the flow and the remainder of the session gets offloaded to Netfilter's connection tracking system.
+{{% /notice %}}
+
+
+
+### Additional Reading
 
 * [**Netfilter Packet flow** ](https://upload.wikimedia.org/wikipedia/commons/3/37/Netfilter-packet-flow.svg)
 * [**Logical diagram of kube-proxy in iptables mode**](https://docs.google.com/drawings/d/1MtWL8qRTs6PlnJrW4dh8135_S9e2SaawT410bJuoBPk/edit)
