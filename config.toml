@@ -12,6 +12,7 @@ home = [ "HTML", "RSS", "JSON"]
 [params]
     description = "The Kubernetes Networking Guide"
     showVisitedLinks = false
+    images = ["static/images/favicon.png"]
     disableLanguageSwitchingButton = true
     disableMermaid = true
     editURL = "https://github.com/networkop/k8s-networking-guide/tree/master/content/"
