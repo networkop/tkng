@@ -91,7 +91,7 @@ $ d KUBE-SERVICES | grep 10.96.94.225
     3   180 KUBE-SVC-LOLE4ISW44XBNF3G  tcp  --  *      *       0.0.0.0/0            10.96.94.225         /* default/web cluster IP */ tcp dpt:80
 {{< / highlight >}}
 
-Since the sourceIP of the packet belongs to one of the Pods (within the `10.244.0.0/16` range), the second line gets matched and the lookup continues in the service-specific chain. Here we have two Pods matching the same label-selector (`--replicas=2`) and both chains are configured with equal distribution probability:
+Since the sourceIP of the packet belongs to a Pod (`10.244.0.0/16` is the PodCIDR range), the second line gets matched and the lookup continues in the service-specific chain. Here we have two Pods matching the same label-selector (`--replicas=2`) and both chains are configured with equal distribution probability:
 
 {{< highlight bash "linenos=false,hl_lines=4 12" >}}
 $ d KUBE-SVC-LOLE4ISW44XBNF3G
@@ -101,7 +101,7 @@ Chain KUBE-SVC-LOLE4ISW44XBNF3G (1 references)
     0     0 KUBE-SEP-ZA2JI7K7LSQNKDOS  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/web */
 {{< / highlight >}}
 
-Let's assume that in this case the first rule gets matched, so our packet continues on to the next chain where it gets DNAT'ed to the target IP of the destination Pod:
+Let's assume that in this case the first rule gets matched, so our packet continues on to the next chain where it gets DNAT'ed to the target IP of the destination Pod (`10.244.1.3`):
 
 {{< highlight bash "linenos=false,hl_lines=5" >}}
 $ d KUBE-SEP-MHDQ23KUGG7EGFMW
@@ -111,7 +111,7 @@ Chain KUBE-SEP-MHDQ23KUGG7EGFMW (1 references)
     3   180 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/web */ tcp to:10.244.1.3:80
 {{< / highlight >}}
 
-From here on our packet remains unmodified and continues along its forwarding path set up by the [CNI plugin](/cni/kindnet/) until it reaches the target Node and gets sent directly to the destination Pod.
+From here on our packet remains unmodified and continues along its forwarding path set up by a [CNI plugin](/cni/kindnet/) until it reaches the target Node and gets sent directly to the destination Pod.
 
 
 
@@ -166,7 +166,7 @@ Chain KUBE-POSTROUTING (1 references)
 {{< / highlight >}}
 
 
-The final `MASQUERADE` action ensures that the return packets follow the same way back, even if they were originated from outside of the Kubernetes cluster.
+The final `MASQUERADE` action ensures that the return packets follow the same way back, even if they were originated outside of the Kubernetes cluster.
 
 {{% notice info %}}
 The above sequence of lookups may look long an inefficient but bear in mind that this is only done once, for the first packet of the flow and the remainder of the session gets offloaded to Netfilter's connection tracking system.
