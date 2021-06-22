@@ -9,3 +9,5 @@ Endpoint slices
 Topology-aware routing
 
 traffic policy local
+
+https://github.com/kubernetes/enhancements/blob/0e4d5df19d396511fe41ed0860b0ab9b96f46a2d/keps/sig-network/1507-app-protocol/README.md#risks-and-mitigations
