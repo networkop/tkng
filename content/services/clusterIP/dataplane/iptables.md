@@ -49,10 +49,10 @@ $ kubectl expose deploy web --port 80
 The result of the above two commands can be verified like this:
 
 ```bash
-$ kubectlget deploy web
+$ kubectl get deploy web
 NAME   READY   UP-TO-DATE   AVAILABLE   AGE
 web    2/2     2            2           160m
-$ kubectlget svc web
+$ kubectl get svc web
 NAME   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
 web    ClusterIP   10.96.94.225    <none>        8080/TCP   31s
 ```
@@ -73,11 +73,11 @@ $ alias d="docker exec k8s-guide-worker iptables -t nat -nvL"
 
 ### Use case #1: Pod-to-Service communication
 
-According to Tim's [diagram](https://docs.google.com/drawings/d/1MtWL8qRTs6PlnJrW4dh8135_S9e2SaawT410bJuoBPk/edit) all Pod-to-Service packets get intercepted by the `OUTPUT` chain:
+According to Tim's [diagram](https://docs.google.com/drawings/d/1MtWL8qRTs6PlnJrW4dh8135_S9e2SaawT410bJuoBPk/edit) all Pod-to-Service packets get intercepted by the `PREROUTING` chain:
 
 {{< highlight bash "linenos=false,hl_lines=4" >}}
-$ d OUTPUT
-Chain OUTPUT (policy ACCEPT 84 packets, 5040 bytes)
+$ d PREROUTING
+Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)
  pkts bytes target     prot opt in     out     source               destination
   313 18736 KUBE-SERVICES  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service portals */
    36  2242 DOCKER_OUTPUT  all  --  *      *       0.0.0.0/0            172.16.0.190
