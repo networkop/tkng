@@ -166,30 +166,30 @@ UDP  10.96.0.10:53 rr
 
 
 ```
-~/k8s-guide-labs master ❯ ipt OUTPUT                                          0.40  5.17G  172.28.143.166 ⇣0.11 KiB/s ⇡0.11 KiB/s
+$ ipt OUTPUT
 Chain OUTPUT (policy ACCEPT 5 packets, 300 bytes)
  pkts bytes target     prot opt in     out     source               destination
  1062 68221 KUBE-SERVICES  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service portals */
   287 19636 DOCKER_OUTPUT  all  --  *      *       0.0.0.0/0            192.168.224.1
-~/k8s-guide-labs master ❯ ipt KUBE-SERVICES                                   0.43  5.17G  172.28.143.166 ⇣4.07 KiB/s ⇡2.05 KiB/s
+$ ipt KUBE-SERVICES
 Another app is currently holding the xtables lock. Perhaps you want to use the -w option?
-~/k8s-guide-labs master ❯ ipt KUBE-SERVICES                                   0.44  5.16G  172.28.143.166 ⇣0.61 KiB/s ⇡0.36 KiB/s
+$ ipt KUBE-SERVICES
 Chain KUBE-SERVICES (2 references)
  pkts bytes target     prot opt in     out     source               destination
     0     0 KUBE-MARK-MASQ  all  --  *      *      !10.244.0.0/16        0.0.0.0/0            /* Kubernetes service cluster ip + port for masquerade purpose */ match-set KUBE-CLUSTER-IP dst,dst
     0     0 KUBE-NODE-PORT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
     0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            match-set KUBE-CLUSTER-IP dst,dst
-~/k8s-guide-labs master ❯ ipt KUBE-MARK-MASQ                                  0.43  5.12G  172.28.143.166 ⇣0.33 KiB/s ⇡0.22 KiB/s
+$ ipt KUBE-MARK-MASQ
 Chain KUBE-MARK-MASQ (13 references)
  pkts bytes target     prot opt in     out     source               destination
     0     0 MARK       all  --  *      *       0.0.0.0/0            0.0.0.0/0            MARK or 0x4000
-~/k8s-guide-labs master ❯ ipt POSTROUTING                                     0.42  5.16G  172.28.143.166 ⇣0.76 KiB/s ⇡0.42 KiB/s
+$ ipt POSTROUTING
 Chain POSTROUTING (policy ACCEPT 5 packets, 300 bytes)
  pkts bytes target     prot opt in     out     source               destination
  1199 80799 KUBE-POSTROUTING  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes postrouting rules */
     0     0 DOCKER_POSTROUTING  all  --  *      *       0.0.0.0/0            192.168.224.1
   920 61751 KIND-MASQ-AGENT  all  --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type !LOCAL /* kind-masq-agent: ensure nat POSTROUTING directs all non-LOCAL destination traffic to our custom KIND-MASQ-AGENT chain */
-~/k8s-guide-labs master ❯ ipt KUBE-POSTROUTING                                0.41  5.16G  172.28.143.166 ⇣0.99 KiB/s ⇡0.58 KiB/s
+$ ipt KUBE-POSTROUTING                                0.41  5.16G  172.28.143.166 ⇣0.99 KiB/s ⇡0.58 KiB/s
 Chain KUBE-POSTROUTING (1 references)
  pkts bytes target     prot opt in     out     source               destination
     0     0 MASQUERADE  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* Kubernetes endpoints dst ip:port, source ip for solving hairpin purpose */ match-set KUBE-LOOP-BACK dst,dst,src
