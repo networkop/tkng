@@ -224,6 +224,16 @@ Chain KUBE-POSTROUTING (1 references)
     0     0 MASQUERADE  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service traffic requiring SNAT */ random-fully
 {{< / highlight >}}
 
-{{< highlight bash "linenos=false,hl_lines=3-4 7" >}}
-$ ipt KUBE-LOOP-BACK
+{{< highlight bash "linenos=false,hl_lines=11" >}}
+$ ips KUBE-LOOP-BACK
+Name: KUBE-LOOP-BACK
+Type: hash:ip,port,ip
+Revision: 5
+Header: family inet hashsize 1024 maxelem 65536
+Size in memory: 360
+References: 1
+Number of entries: 2
+Members:
+10.244.1.2,tcp:3030,10.244.1.2
+10.244.1.6,tcp:80,10.244.1.6
 {{< / highlight >}}
