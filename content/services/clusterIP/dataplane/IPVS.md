@@ -4,17 +4,24 @@ date: 2020-09-13T17:33:04+01:00
 weight: 20
 ---
 
+IPTables has been the first implementation of `kube-proxy`'s dataplane, however, overtime its limitations has become more and more pronounced, especially when operating at scale. There are several side-effects of implementing a proxy with something that was designed to be a firewall, the main one being a limited set of data structures. The way it manifests itself is that every ClusterIP Service needs to have a unique entry, these entries can't be grouped and have to be processed sequentially as chains of tables. This means that any dataplane lookup or a create/update/delete operation needs to traverse the entire chain until the match is found and can result in [minutes](https://docs.google.com/presentation/d/1BaIAywY2qqeHtyGZtlyAp89JIZs59MZLKcFLxKE6LyM/edit#slide=id.p20) of added processing time. 
 
-https://www.projectcalico.org/comparing-kube-proxy-modes-iptables-or-ipvs/
+{{% notice note %}}
+Some of the findings and measurement results can be found in the [Additional Reading](#additional-reading) section at the bottom of the page.
+{{% /notice %}}
 
-https://kubernetes.io/blog/2018/07/09/ipvs-based-in-cluster-load-balancing-deep-dive/
+All these led to `ipvs` being added as an [enhancement proposal](https://github.com/kubernetes/enhancements/tree/0e4d5df19d396511fe41ed0860b0ab9b96f46a2d/keps/sig-network/265-ipvs-based-load-balancing) which eventually graduated to GA in Kubernetes version 1.11. The new mode of operation offers a number of optimisations over the legacy `iptable` mode:
 
-https://github.com/kubernetes/enhancements/tree/0e4d5df19d396511fe41ed0860b0ab9b96f46a2d/keps/sig-network/265-ipvs-based-load-balancing
+* All Service load-balancing is being migrated to a dummy netlink interface (`kube-ipvs0`) which gets configured with all ClusterIPs.
 
-https://docs.google.com/presentation/d/1BaIAywY2qqeHtyGZtlyAp89JIZs59MZLKcFLxKE6LyM/edit
+* The remaining rules in IPTables have been re-engineered to use [ipset](https://wiki.archlinux.org/title/Ipset), making the lookups more effecient.
 
-scheduler
-https://kubernetes.io/blog/2018/07/09/ipvs-based-in-cluster-load-balancing-deep-dive/#parameter-changes
+* Multiple additional load-balancer [scheduling modes](https://kubernetes.io/blog/2018/07/09/ipvs-based-in-cluster-load-balancing-deep-dive/#parameter-changes) are now available, with the default one being a simple round-robin.
+
+
+On the surface, this makes the decision to switch to `ipvs` an obvious one, however, since `iptables` have been the default mode for so long, some of its quirks and undocumented side-effects have become the standard. One of the fortunate side-effects of the `iptables` mode is that `ClusterIP` is never bound to any kernel interface and remains completely virtual (as a NAT rule). So when  `ipvs` changed this behaviour, it [made it possible](https://github.com/kubernetes/kubernetes/issues/72236) for processes inside Pods to access host-local services by targeting any existing `ClusterIP`. Although this does make `ipvs` less safe by default, it doesn't mean that these risks can't be mitigaged (e.g. by not binding to `0.0.0.0`).
+
+The diagram below is a high-level and simplified view of two distinct datapaths to the same `ClusterIP` -- one from a remote Pod and one from a host-local interface.
 
 
 {{< iframe "https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&hide-pages=1&editable=false&layers=1&nav=0&page-id=BucKDkpFbDgBnzcmmJd5&title=k8s-guide.drawio#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fnetworkop%2Fk8s-guide-labs%2Fmaster%2Fdiagrams%2Fk8s-guide.drawio" >}}
@@ -237,3 +244,12 @@ Members:
 10.244.1.2,tcp:3030,10.244.1.2
 10.244.1.6,tcp:80,10.244.1.6
 {{< / highlight >}}
+
+
+### Additional reading
+
+[Scaling Kubernetes to Support 50,000 Services](https://docs.google.com/presentation/d/1BaIAywY2qqeHtyGZtlyAp89JIZs59MZLKcFLxKE6LyM/edit#slide=id.p19)
+
+[Comparing kube-proxy modes: iptables or IPVS?](https://www.projectcalico.org/comparing-kube-proxy-modes-iptables-or-ipvs/)
+
+[IPVS-Based In-Cluster Load Balancing Deep Dive](https://kubernetes.io/blog/2018/07/09/ipvs-based-in-cluster-load-balancing-deep-dive/)
