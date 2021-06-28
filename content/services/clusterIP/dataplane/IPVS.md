@@ -4,7 +4,7 @@ date: 2020-09-13T17:33:04+01:00
 weight: 20
 ---
 
-IPTables has been the first implementation of kube-proxy's dataplane, however, overtime its limitations have become more pronounced, especially when operating at scale. There are several side-effects of implementing a proxy with something that was designed to be a firewall, the main one being being a limited set of data structures. The way it manifests itself is that every ClusterIP Service needs to have a unique entry, these entries can't be grouped and have to be processed sequentially as chains of tables. This means that any dataplane lookup or a create/update/delete operation needs to traverse the chain until a match is found which can result in [minutes](https://docs.google.com/presentation/d/1BaIAywY2qqeHtyGZtlyAp89JIZs59MZLKcFLxKE6LyM/edit#slide=id.p20) of added processing time. 
+IPTables has been the first implementation of kube-proxy's dataplane, however, over time its limitations have become more pronounced, especially when operating at scale. There are several side-effects of implementing a proxy with something that was designed to be a firewall, the main one being a limited set of data structures. The way it manifests itself is that every ClusterIP Service needs to have a unique entry, these entries can't be grouped and have to be processed sequentially as chains of tables. This means that any dataplane lookup or a create/update/delete operation needs to traverse the chain until a match is found which, at a large-enough scale can result in [minutes](https://docs.google.com/presentation/d/1BaIAywY2qqeHtyGZtlyAp89JIZs59MZLKcFLxKE6LyM/edit#slide=id.p20) of added processing time. 
 
 {{% notice note %}}
 Detailed performance analysis and measurement results of running iptables at scale can be found in the [Additional Reading](#additional-reading) section at the bottom of the page.
@@ -14,12 +14,12 @@ All this led to `ipvs` being added as an [enhancement proposal](https://github.c
 
 * All Service load-balancing is migrated to IPVS which can perform in-kernel lookups and masquerading in constant time, regardless of the number of configured Services or Endpoints.
 
-* The remaining rules in IPTables have been re-engineered to make use of [ipset](https://wiki.archlinux.org/title/Ipset), making the lookups more effecient.
+* The remaining rules in IPTables have been re-engineered to make use of [ipset](https://wiki.archlinux.org/title/Ipset), making the lookups more efficient.
 
 * Multiple additional load-balancer [scheduling modes](https://kubernetes.io/blog/2018/07/09/ipvs-based-in-cluster-load-balancing-deep-dive/#parameter-changes) are now available, with the default one being a simple round-robin.
 
 
-On the surface, this makes the decision to use `ipvs` an obvious one, however, since `iptables` have been the default mode for so long, some of its quirks and undocumented side-effects have become the standard. One of the fortunate side-effects of the `iptables` mode is that `ClusterIP` is never bound to any kernel interface and remains completely virtual (as a NAT rule). So when  `ipvs` changed this behaviour by introducing a dummy `kube-ipvs0` interface, it [made it possible](https://github.com/kubernetes/kubernetes/issues/72236) for processes inside Pods to access any host-local services bound to `0.0.0.0` by targeting any existing `ClusterIP`. Although this does make `ipvs` less safe by default, it doesn't mean that these risks can't be mitigaged (e.g. by not binding to `0.0.0.0`).
+On the surface, this makes the decision to use `ipvs` an obvious one, however, since `iptables` have been the default mode for so long, some of its quirks and undocumented side-effects have become the standard. One of the fortunate side-effects of the `iptables` mode is that `ClusterIP` is never bound to any kernel interface and remains completely virtual (as a NAT rule). So when  `ipvs` changed this behaviour by introducing a dummy `kube-ipvs0` interface, it [made it possible](https://github.com/kubernetes/kubernetes/issues/72236) for processes inside Pods to access any host-local services bound to `0.0.0.0` by targeting any existing `ClusterIP`. Although this does make `ipvs` less safe by default, it doesn't mean that these risks can't be mitigated  (e.g. by not binding to `0.0.0.0`).
 
 The diagram below is a high-level and simplified view of two distinct datapaths for the same `ClusterIP` virtual service -- one from a remote Pod and one from a host-local interface.
 
@@ -50,7 +50,7 @@ $ make kube-proxy-logs | grep -i ipvs
 E0626 17:19:43.491383       1 server_others.go:127] Can't use the IPVS proxier: IPVS proxier will not be used because the following required kernel modules are not loaded: [ip_vs ip_vs_rr ip_vs_wrr ip_vs_sh]
 ```
 
-Another way to confirm that the change has suceeded is to check that Nodes now have a new dummy ipvs device:
+Another way to confirm that the change has succeeded  is to check that Nodes now have a new dummy ipvs device:
 
 {{< highlight bash "linenos=false,hl_lines=2" >}}
 $ docker exec -it k8s-guide-worker ip link show kube-ipvs0 
@@ -254,7 +254,7 @@ Chain KUBE-POSTROUTING (1 references)
     0     0 MASQUERADE  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service traffic requiring SNAT */ random-fully
 {{< / highlight >}}
 
-The final masquerading action is performed if the destination IP and Port matche one of the local Endpoints which are stored in the `KUBE-LOOP-BACK` ipset:
+The final masquerading action is performed if the destination IP and Port match one of the local Endpoints which are stored in the `KUBE-LOOP-BACK` ipset:
 
 {{< highlight bash "linenos=false,hl_lines=11" >}}
 $ ips KUBE-LOOP-BACK
@@ -271,7 +271,7 @@ Members:
 {{< / highlight >}}
 
 {{% notice info %}}
-It should be noted that, similar to the iptables mode, all of the above lookups are only performed for the first packet of the session and all subsequent packets follow a much shorter path in conntrack subsystem. 
+It should be noted that, similar to the iptables mode, all of the above lookups are only performed for the first packet of the session and all subsequent packets follow a much shorter path in the conntrack subsystem. 
 {{% /notice %}}
 
 
