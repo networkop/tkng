@@ -1,4 +1,4 @@
-baseURL = "http://k8s.networkop.co.uk/"
+baseURL = "http://tkng.io/"
 languageCode = "en-us"
 title = "The Kubernetes Networking Guide"
 theme = "hugo-theme-learn"
@@ -12,7 +12,7 @@ home = [ "HTML", "RSS", "JSON"]
 [params]
     description = "The Kubernetes Networking Guide"
     showVisitedLinks = false
-    images = ["static/images/favicon.png"]
+    images = ["static/images/k8s-guide-logo.svg"]
     disableLanguageSwitchingButton = true
     disableMermaid = true
     editURL = "https://github.com/networkop/k8s-networking-guide/tree/master/content/"
