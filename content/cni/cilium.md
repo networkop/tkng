@@ -31,20 +31,17 @@ For demonstration purposes, we'll use a VXLAN-based configuration option and the
 
 ### Preparation
 
+
 Assuming that the lab environment is already [set up](/lab/), Cilium can be enabled with the following command:
 
 ```bash
 make cilium 
 ```
 
-Check that the cilium daemonset has all pods in `READY` state:
+Wait for Cilium daemonset to initialize:
 
 ```bash
-$ make cilium-check 
-kubectl wait --for=condition=ready --timeout=60s -n cilium pod -l k8s-app=cilium
-pod/cilium-k5bgk condition met
-pod/cilium-klnz7 condition met
-pod/cilium-nlwx4 condition met
+make cilium-wait
 ```
 
 Now we need to "kick" all Pods to restart and pick up the new CNI plugin:
@@ -53,10 +50,19 @@ Now we need to "kick" all Pods to restart and pick up the new CNI plugin:
 make nuke-all-pods
 ```
 
-To make sure there's is no interference from `kube-proxy` all iptables NAT rules need to be flushed:
+To make sure there's is no interference from `kube-proxy` we'll remove it completely along with any IPTables rules set up by it:
 
 ```
-make flush-nat 
+make nuke-kube-proxy
+```
+
+Check that the cilium is healthy:
+
+```bash
+$ make cilium-check | grep health
+Cilium health daemon:       Ok
+Controller Status:      	40/40 healthy
+Cluster health:         	3/3 reachable   (2021-08-02T19:52:07Z)
 ```
 
 ### Walkthrough
@@ -168,7 +174,7 @@ int tail_handle_arp(struct __ctx_buff *ctx)
 }
 ```
 
-This leads to the `cilium/bpf/lib/apr.h` where ARP reply is first [prepared](https://github.com/cilium/cilium/blob/v1.9.1/bpf/lib/arp.h#L79) and then [sent back](https://github.com/cilium/cilium/blob/v1.9.1/bpf/lib/arp.h#L86) to the ingress interface using the XDP Redirect action:
+This leads to the `cilium/bpf/lib/apr.h` where ARP reply is first [prepared](https://github.com/cilium/cilium/blob/v1.9.1/bpf/lib/arp.h#L79) and then [sent back](https://github.com/cilium/cilium/blob/v1.9.1/bpf/lib/arp.h#L86) to the ingress interface using the redirect action:
 
 ```c
 static __always_inline int
@@ -451,7 +457,7 @@ The result contains one important value which will be used later to build an out
 
 5. Once the lookup results are [processed](https://github.com/cilium/cilium/blob/v1.9.1/bpf/bpf_lxc.c#L544), execution continues in `handle_ipv4_from_lxc` function and eventually reaches [this](https://github.com/cilium/cilium/blob/v1.9.1/bpf/bpf_lxc.c#L681) encapsulation directive.
 
-6. All encapsulation-related functions are defined inside [`cilium/bpf/lib/encap.h`](https://github.com/cilium/cilium/blob/v1.9.1/cilium/bpf/lib/encap.h) and the packet gets [VXLAN-encapsulated](https://github.com/cilium/cilium/blob/v1.9.1/bpf/lib/encap.h#L136) and [XDP-redirected](https://github.com/cilium/cilium/blob/v1.9.1/bpf/lib/encap.h#L153) straight to the egress VXLAN interface.
+6. All encapsulation-related functions are defined inside [`cilium/bpf/lib/encap.h`](https://github.com/cilium/cilium/blob/v1.9.1/cilium/bpf/lib/encap.h) and the packet gets [VXLAN-encapsulated](https://github.com/cilium/cilium/blob/v1.9.1/bpf/lib/encap.h#L136) and [redirected](https://github.com/cilium/cilium/blob/v1.9.1/bpf/lib/encap.h#L153) straight to the egress VXLAN interface.
 
 7. At this point the packet has all the necessary headers and is delivered to the ingress Node by the underlay (in our case it's docker's Linux bridge).
 
@@ -525,6 +531,10 @@ Chain CILIUM_POST_nat (1 references)
  pkts bytes target     prot opt in     out     source               destination         
     8   555 MASQUERADE  all  --  *      !cilium_+  10.0.0.0/24         !10.0.0.0/24          /* cilium masquerade non-cluster */
 ```
+
+{{% notice info %}}
+Due to a [known issue](https://docs.cilium.io/en/v1.9/gettingstarted/kind/#unable-to-contact-k8s-api-server) with kind, make sure to run `make cilium-unhook` when you're finished with this Cilium lab to detach eBPF programs from the host cgroup.
+{{% /notice %}}
 
 
 ### Caveats and Gotchas
