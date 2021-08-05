@@ -1,4 +1,4 @@
-baseURL = "http://tkng.io/"
+baseURL = "http://www.tkng.io/"
 languageCode = "en-us"
 title = "The Kubernetes Networking Guide"
 theme = "hugo-theme-learn"
