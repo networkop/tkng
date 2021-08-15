@@ -121,10 +121,6 @@ $ curl -s 192.168.224.4:30510 | grep Welcome
 <h1>Welcome to nginx!</h1>
 ```
 
-{{% notice note %}}
-NodePort and Endpoint addresses will differ between each one of the below scenarios.
-{{% /notice %}}
-
 Finally, setup the following command aliases:
 
 ```bash
