@@ -194,7 +194,7 @@ Chain KUBE-SEP-R53NX34J3PCIETEY (1 references)
     1    60 DNAT       tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* default/web */ tcp to:10.244.2.8:80
 ```    
 
-You may have noticed the presence of `KUBE-MARK-MASQ` in the above chains, this rule exists to account for a corner case of Pod talking to its own Service via a [ClusterIP](/services/clusterip/dataplane/iptables/#use-case-1-pod-to-service-communication) (i.e. Pod itself is a part of the Service it's trying to talk to) and the random distribution selecting itself as the destination. In this case, both source and destination IPs will be the same and this rule exists to ensure that the packets get SNAT'ed to prevent packets from being dropped.
+You may have noticed the presence of `KUBE-MARK-MASQ` in the above chains, this rule exists to account for a corner case of Pod talking to its own Service via a [ClusterIP](/services/clusterip/dataplane/iptables/#use-case-1-pod-to-service-communication) (i.e. Pod itself is a part of the Service it's trying to talk to) and the random distribution selecting itself as the destination. In this case, both source and destination IPs will be the same and this rule exists to ensure that the packets get SNAT'ed to prevent them from being dropped.
 
 ---
 
