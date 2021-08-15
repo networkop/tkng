@@ -211,7 +211,7 @@ Chain KUBE-SERVICES (2 references)
     0     0 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            match-set KUBE-CLUSTER-IP dst,dst
 ```
 
-However, its is implemented is slightly different and makes use of [IP sets](https://ipset.netfilter.org/), reducing the time complexity of a lookup from O(N) to O(1):
+However, its is implemented is slightly different and makes use of [IP sets](https://ipset.netfilter.org/), reducing the time complexity of a lookup for N configured Services from O(N) to O(1):
 
 ```
 $ ipt KUBE-NODE-PORT
@@ -220,7 +220,7 @@ Chain KUBE-NODE-PORT (1 references)
     0     0 KUBE-MARK-MASQ  tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            /* Kubernetes nodeport TCP port for masquerade purpose */ match-set KUBE-NODE-PORT-TCP dst
 ```
 
-A set of all configure NodePorts is maintained inside the `KUBE-NODE-PORT-TCP` ipset:
+All configured NodePorts are kept inside the `KUBE-NODE-PORT-TCP` ipset:
 
 ```
 $ ips KUBE-NODE-PORT-TCP                                                                                   ▼
