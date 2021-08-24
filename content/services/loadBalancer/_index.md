@@ -75,8 +75,8 @@ There are many implementations of these cluster add-ons ranging from simple cont
 | [OpenELB](https://github.com/kubesphere/openelb) | Developed as a part of a wider project called [Kubesphere](https://www.cncf.io/wp-content/uploads/2020/12/KubeSphere-chinese-webinar.pdf). Supports both ARP and BGP modes, with BGP implementation built on top of GoBGP. Configured via CRDs. | 
 | [Kube-vip](https://kube-vip.io/) | Started as a solution for Kubernetes control plane high availability and got extended to function as a LoadBalancer controller. Supports both L2 and GoBGP-based L3 modes. Can be configured via flags, env vars and ConfigMaps. |
 |  [PureLB](https://gitlab.com/purelb/purelb) | Fork of metalLB with reworked ARP and BGP implementations. Uses BIRD for BGP and can be configured via CRDs. | 
-| [Klipper](https://rancher.com/docs/k3s/latest/en/networking/#service-load-balancer) | An integrated LB controller for K3S clusters. Implements a NodePort-like functionality but updates `status.loadBalancer` with IP of a K3S Node. |
-| [Akrobateo](https://github.com/kontena/akrobateo) | Extends the idea borrowed from klipper to work on any general-purpose Kubernetes Node (not just K3S). Like klipper, it doesn't use any extra protocol and simply relies on the fact that Node IPs are reachable from the rest of the network. |
+| [Klipper](https://rancher.com/docs/k3s/latest/en/networking/#service-load-balancer) | An integrated LB controller for K3S clusters. Exposes LoadBalancer Services as [hostPorts](https://kubernetes.io/docs/concepts/configuration/overview/#services) on all cluster Nodes. |
+| [Akrobateo](https://github.com/kontena/akrobateo) | Extends the idea borrowed from klipper to work on any general-purpose Kubernetes Node (not just K3S). Like klipper, it doesn't use any extra protocol and simply relies on the fact that Node IPs are reachable from the rest of the network. The project is [no longer active](https://web.archive.org/web/20200107111252/https://blog.kontena.io/farewell/). |
 
 Each of the above projects has its own pros and cons but I deliberately didn't want to make a decision matrix. Instead, I'll provide a list of things worth considering when choosing a LoadBalancer add-on:
 
@@ -314,4 +314,4 @@ If a match is found, packets go through destination NAT and optionally source ad
 
 * For a very long time, Kubernetes only supported a single LoadBalancer Controller. Running multiple controllers has been introduced in a [recent feature](https://github.com/kubernetes/enhancements/tree/master/keps/sig-cloud-provider/1959-service-lb-class-field), however controller implementations are still [catching up](https://github.com/metallb/metallb/issues/685).
 
-* Most of the big public cloud providers do not support the BYO controller model, so cluster add-ons would only work in some clouds (e.g. Packet) but not in others (e.g. AWS, Azure, GCP).
+* Most of the big public cloud providers do not support the BYO controller model, so cluster add-ons that rely on L2 or L3 integration would only work in some clouds (e.g. Packet) but not in others (e.g. AWS, Azure, GCP). However, it's still [possible](https://maelvls.dev/avoid-gke-lb-with-hostport/) to use controllers that use hostPort (e.g. klipper, akrobateo).
