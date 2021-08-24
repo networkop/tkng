@@ -76,4 +76,7 @@ Another less critical, but nonetheless important components is DNS. Internally, 
 
 {{< iframe "https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&hide-pages=1&editable=false&layers=1&nav=0&page-id=HR_OWBqgmX47NSTQvTWL&title=k8s-guide.drawio#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fnetworkop%2Fk8s-guide-labs%2Fmaster%2Fdiagrams%2Fk8s-guide.drawio" >}}
 
+{{% notice info %}}
+This following series of [short youtube videos](https://www.youtube.com/playlist?list=PLoWxE_5hnZUZMWrEON3wxMBoIZvweGeiq) provide a very good, albeit a vendor-centric, overview of various types of Kubernetes Networking.
+{{% /notice %}}
 

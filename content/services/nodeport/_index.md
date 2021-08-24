@@ -71,6 +71,13 @@ One important thing worth remembering is that a NodePort Service is rarely used 
 
 ## Lab
 
+To demonstrate the different modes of dataplane operation, we'll use three different scenarios:
+
+* **IPTables** orchestrated by kube-proxy
+* **IPVS** as orchestrated by kube-proxy
+* **eBPF** as orchestrated by Cilium
+
+
 ### Preparation
 
 Refer to the respective chapters for the instructions on how to setup the [IPTables](/services/clusterip/dataplane/iptables/#lab-setup), [IPVS](/services/clusterip/dataplane/ipvs/#lab-setup) or [Cilium eBPF](/services/clusterip/dataplane/ebpf/#preparation) data planes.  Once the required data plane is configured, setup a test deployment with 3 Pods and expose it via a NodePort Service:
