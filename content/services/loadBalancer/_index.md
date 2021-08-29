@@ -26,7 +26,7 @@ From the networking point of view, a LoadBalancer Service is expected to accompl
 * Make sure the packets for this IP get delivered to one of the Kubernetes Nodes.
 * Program Node-local data plane to deliver the incoming traffic to one of the healthy backend Endpoints.
 
-By default, Kubernetes will only take care of the last item, i.e. `kube-proxy` (or it's equivalent) will program a Node-local data plane to enable external reachability -- most of the work to enable this is already done by the [NodePort](/services/nodeport/) implementation. However, the most challenging part -- IP allocation and reachability -- is left for external implementations. What this means is that in a vanilla Kubernetes cluster, LoadBalancer Services will remain in a "pending" state, i.e. they will have no external IP and will not be reachable from the outside:
+By default, Kubernetes will only take care of the last item, i.e. `kube-proxy` (or it's equivalent) will program a Node-local data plane to enable external reachability -- most of the work to enable this is already done by the [NodePort](/services/nodeport/) implementation. However, the most challenging part -- IP allocation and reachability -- is left to external implementations. What this means is that in a vanilla Kubernetes cluster, LoadBalancer Services will remain in a "pending" state, i.e. they will have no external IP and will not be reachable from the outside:
 
 ```bash
 $ kubectl get svc web
@@ -59,8 +59,8 @@ status:
 
 As anything involving orchestration of external infrastructure, the mode of operation of a LoadBalancer controller depends on its environment:
 
-* Both on-prem and public **cloud-based clusters** can use existing cloud L4 load-balancers, e.g. [Network Load Balancer](https://docs.aws.amazon.com/eks/latest/userguide/network-load-balancing.html) (NLB) for Amazon Elastic Kubernetes Service (EKS), [Standard Load Balancer](https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard) for Azure Kubernetes Services (AKE), [Cloud Load Balancer](https://cloud.google.com/load-balancing/docs/network) for Google Kubernetes Engine (GKE), [LBaaS plugin](https://docs.openstack.org/kuryr-kubernetes/latest/installation/services.html) for Openstack or [NSX ALB](https://docs.vmware.com/en/VMware-Tanzu/services/tanzu-adv-deploy-config/GUID-avi-ako-tkg.html) for VMWare.
-The in-cluster components responsible for load-balancer orchestration is called [`cloud-controller-manager`](https://kubernetes.io/docs/concepts/architecture/cloud-controller/) and is usually deployed next to the `kube-controller-manager` as a part of the Kubernetes control plane.
+* Both on-prem and public **cloud-based clusters** can use existing cloud L4 load balancers, e.g. [Network Load Balancer](https://docs.aws.amazon.com/eks/latest/userguide/network-load-balancing.html) (NLB) for Amazon Elastic Kubernetes Service (EKS), [Standard Load Balancer](https://docs.microsoft.com/en-us/azure/aks/load-balancer-standard) for Azure Kubernetes Services (AKE), [Cloud Load Balancer](https://cloud.google.com/load-balancing/docs/network) for Google Kubernetes Engine (GKE), [LBaaS plugin](https://docs.openstack.org/kuryr-kubernetes/latest/installation/services.html) for Openstack or [NSX ALB](https://docs.vmware.com/en/VMware-Tanzu/services/tanzu-adv-deploy-config/GUID-avi-ako-tkg.html) for VMWare.
+The in-cluster components responsible for load balancer orchestration is called [`cloud-controller-manager`](https://kubernetes.io/docs/concepts/architecture/cloud-controller/) and is usually deployed next to the `kube-controller-manager` as a part of the Kubernetes control plane.
 
 * **On-prem clusters** can have multiple configurations options, depending on the requirements and what infrastructure may already be available in a data centre: 
   * Existing **load-balancer appliances** from incumbent vendors like F5 can be [integrated](https://cloud.google.com/architecture/partners/installing-f5-big-ip-adc-for-gke-on-prem?hl=en) with on-prem clusters allowing for the same appliance instance to be re-used for multiple purposes.
@@ -89,9 +89,9 @@ Each of the above projects has its own pros and cons but I deliberately didn't w
 
 Finally, it's very important to understand why LoadBalancer Services are also assigned with a unique NodePort ([previous chapter](/services/nodeport/) explains how it happens). As we'll see in the below [lab scenarios](/services/loadbalancer/#lab), NodePort is not really needed if we use direct network integration via BGP or ARP. In these cases, the underlying physical network is aware of both the external IP, as learned from BGP's NLRI or ARP's SIP/DIP fields, and its next-hop learned from BGP's next-hop or ARP's source MAC fields. This information is advertised throughout the network so that every device knows where to send these packets. 
 
-However, the same does not apply to environments where L4 load-balancer is located multiple hops away from cluster Nodes. In these cases, intermediate network devices are not aware of external IPs and only know how to forward packets to Node IPs. This is why an external load-balancer will DNAT incoming packets to one of the Node IPs and will use NodePort as a unique identifier of a target Service.
+However, the same does not apply to environments where L4 load balancer is located multiple hops away from cluster Nodes. In these cases, intermediate network devices are not aware of external IPs and only know how to forward packets to Node IPs. This is why an external load balancer will DNAT incoming packets to one of the Node IPs and will use NodePort as a unique identifier of a target Service.
 
-The last point is summarised in the following high-level diagram, showing how load-balancers operate in two different scenarios:
+The last point is summarised in the following high-level diagram, showing how load balancers operate in two different scenarios:
 
 
 {{< iframe "https://viewer.diagrams.net/?highlight=0000ff&edit=_blank&hide-pages=1&editable=false&layers=1&nav=0&page-id=xeDI84nk2ZPcPtgblqcf&title=k8s-guide.drawio#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fnetworkop%2Fk8s-guide-labs%2Fmaster%2Fdiagrams%2Fk8s-guide.drawio" >}}
