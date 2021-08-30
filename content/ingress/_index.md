@@ -14,10 +14,10 @@ Egress may have a slightly different meaning in the context of service meshes an
 {{% /notice %}}
 
 
-Because of the above differences, ingress and egress traffic needs to be examined separately and this chapter will be split into the following subchapters:
+Because of the above differences, ingress and egress traffic needs to be examined separately and this part of the guide will be split into the following chapters:
 
-* **Ingress API** -- the original method of routing incoming traffic to different cluster applications.
-* **Gateway API** -- can be treated as the evolution of the Ingress API with the same goals and scope.
-* **Egress** -- describes different options for egress traffic engineering.
+* [**Ingress API**](/ingress/ingress/) -- the original method of routing incoming traffic to different cluster applications.
+* [**Gateway API**](/ingress/gateway/) -- can be treated as the evolution of the Ingress API with the same goals and scope.
+* [**Egress**](/ingress/egress/) -- describes different options for egress traffic engineering.
 
 
