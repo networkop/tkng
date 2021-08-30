@@ -5,16 +5,16 @@ weight: 20
 summary: "Evolution of Ingress API"
 ---
 
-Ingress API has had a very difficult history and had remained in `v1beta1` for many years. Despite having a thriving ecosystem of controller implementations, their use of Ingress API have remained largely incompatible. In addition to that, the same controller vendors have started shipping their own set of custom resources designed to address the limitations of Ingress API. At some point Kubernetes SIG Network group even discussed the possibility of scrapping the Ingress API altogether and letting each vendor bring their own set of CRDs (see "Ingress Discussion Notes" in [Network SIG Meeting Minutes](https://docs.google.com/document/d/1_w77-zG_Xj0zYvEMfQZTQ-wPP4kXkpGD8smVtW_qqWM/edit)). Despite all that, Ingress API has survived, addressed some of the more pressing issues and finally got promoted to `v1` in Kuberntes `v1.19`. However some of the problems could not be solved by an incremental re-design and this is why the [Gateway API](https://gateway-api.sigs.k8s.io/) project (formerly called Service API) was founded. 
+Ingress API has had a very difficult history and had remained in `v1beta1` for many years. Despite having a thriving ecosystem of controller implementations, their use of Ingress API have remained largely incompatible. In addition to that, the same controller vendors have started shipping their own set of custom resources designed to address the limitations of Ingress API. At some point, Kubernetes SIG Network group even discussed the possibility of scrapping the Ingress API altogether and letting each vendor bring their own set of CRDs (see "Ingress Discussion Notes" in [Network SIG Meeting Minutes](https://docs.google.com/document/d/1_w77-zG_Xj0zYvEMfQZTQ-wPP4kXkpGD8smVtW_qqWM/edit)). Despite all that, Ingress API has survived, addressed some of the more pressing issues and finally got promoted to `v1` in Kuberntes `v1.19`. However, some of the problems could not be solved by an incremental re-design and this is why the [Gateway API](https://gateway-api.sigs.k8s.io/) project (formerly called Service API) was founded. 
 
-Gateway API decomposes a single Ingress API into a a set of [independent resources](https://gateway-api.sigs.k8s.io/concepts/api-overview/) that can be combined via label selectors and references to build the desired proxy state. This decomposition follows a pattern very commonly found in proxy configuration -- listener, route and backends -- and can be viewed as a hiererchy of objects:
+Gateway API decomposes a single Ingress API into a set of [independent resources](https://gateway-api.sigs.k8s.io/concepts/api-overview/) that can be combined via label selectors and references to build the desired proxy state. This decomposition follows a pattern very commonly found in proxy configuration -- listener, route and backends -- and can be viewed as a hierarchy of objects:
 
 |Hierarchy | Description |
 |--------------|---|
 | Gateway Class | Identifies a single GatewayAPI controller installed in a cluster. |
-| Gateway | Associates listeners with Routes, belongs to ony of the Gateway classes. |
+| Gateway | Associates listeners with Routes, belongs to one of the Gateway classes. |
 | Route | Defines rules for traffic routing by linking Gateways with Services. |
-| Service | Represents a set of Endpoints to be used a backends. |
+| Service | Represents a set of Endpoints to be used as backends. |
 
 This is how the above hierarchy can be combined to expose an existing `web` Service to the outside world as `http://gateway.tkng.io` (see the Lab [walkthrough](http://localhost:1313/ingress/gateway/#walkthrough) for more details):
 
@@ -73,7 +73,7 @@ Regardless of all the new features and operational benefits Gateway API brings, 
 
 ## Lab
 
-For this lab exercise, we'll use one the Gateway API implementation from [Istio](https://kubernetes.github.io/ingress-nginx/). 
+For this lab exercise, we'll use one of the Gateway API implementations from [Istio](https://kubernetes.github.io/ingress-nginx/). 
 
 
 ### Preparation
@@ -145,7 +145,7 @@ ADDRESS PORT  MATCH DESTINATION
 0.0.0.0 15090 ALL   Inline Route: /stats/prometheus*
 ```
 
-The one that we're interested in is called `http.8080` and here how we can check all of the routing currently configured for it:
+The one that we're interested in is called `http.8080` and here is how we can check all of the routing currently configured for it:
 
 ```json
 "istioctl proxy-config route istio-ingressgateway-574dff7b88-tnqck.istio-system --name http.8080 -ojson"
