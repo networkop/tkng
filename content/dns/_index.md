@@ -23,7 +23,7 @@ Historically, there had been two implementations of this DNS spec -- one based o
 
 
 
-## Kubernetes Service Discovery -- Server side
+## Service Discovery -- Server side
 
 CoreDNS implements the Kubernetes DNS spec in a [dedicated plugin](https://coredns.io/plugins/kubernetes/) that gets compiled into a static binary and deployed in a Kubernetes cluster as a Deployment and exposed as a ClusterIP service. This means that all communications with the DNS service inside a cluster are subject to the same network forwarding rules used by normal Pods and set up by the [CNI](/cni/) and [Services](/services/) plugins.
 
@@ -61,7 +61,7 @@ metadata:
   namespace: kube-system
 ```
 
-## Kubernetes Service Discovery -- Client side
+## Service Discovery -- Client side
 
 DNS configuration inside a Pod is controlled by the `spec.dnsPolicy` and `spec.dnsConfig` [settings](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy). By default, kubelet will configure the cluster DNS IP, stored in the configuration file and [hard-coded](https://github.com/kubernetes/kubernetes/blob/cde45fb161c5a4bfa7cfe45dfd814f6cc95433f7/cmd/kubeadm/app/constants/constants.go#L638) to the tenth IP of the ClusterIP range by the kubeadm.
 
