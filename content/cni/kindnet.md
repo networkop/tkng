@@ -33,11 +33,11 @@ Pod IP should have a /24 subnet mask (same as `PodCIDR`) and the default route p
 ```
 $ NODE=k8s-guide-worker2 make tshoot
 bash-5.0# ip -br -4 add show eth0
-eth0@if5         UP             10.244.1.8/24 
+eth0@if5         UP             10.244.2.8/24 
 bash-5.1# ip route
-default via 10.244.1.1 dev eth0
-10.244.1.0/24 via 10.244.1.1 dev eth0 src 10.244.1.8
-10.244.1.1 dev eth0 scope link src 10.244.1.8
+default via 10.244.2.1 dev eth0
+10.244.2.0/24 via 10.244.2.1 dev eth0 src 10.244.2.8
+10.244.2.1 dev eth0 scope link src 10.244.2.8
 ```
 
 {{% notice note %}}
@@ -54,12 +54,12 @@ docker exec -it k8s-guide-worker2 bash
 root@k8s-guide-worker2:/# ip route
 default via 172.18.0.1 dev eth0 
 10.244.0.0/24 via 172.18.0.10 dev eth0 
-10.244.1.0/24 via 172.18.0.12 dev eth0 
-10.244.1.2 dev vethf821f7f9 scope host 
-10.244.1.3 dev veth87514986 scope host 
-10.244.1.4 dev veth9829983c scope host 
-10.244.1.5 dev veth010c83ae scope host 
-10.244.1.8 dev vetha1079faf scope host 
+10.244.2.0/24 via 172.18.0.12 dev eth0 
+10.244.2.2 dev vethf821f7f9 scope host 
+10.244.2.3 dev veth87514986 scope host 
+10.244.2.4 dev veth9829983c scope host 
+10.244.2.5 dev veth010c83ae scope host 
+10.244.2.8 dev vetha1079faf scope host 
 ```
 
 3. PodCIDR gateway
@@ -68,11 +68,11 @@ One notable thing is that the root namespace side of all veth links has the same
 
 ```
 root@k8s-guide-worker2:/# ip -br -4 addr show | grep veth
-vethf821f7f9@if3 UP             10.244.1.1/32 
-veth87514986@if3 UP             10.244.1.1/32 
-veth9829983c@if3 UP             10.244.1.1/32 
-veth010c83ae@if3 UP             10.244.1.1/32 
-vetha1079faf@if3 UP             10.244.1.1/32 
+vethf821f7f9@if3 UP             10.244.2.1/32 
+veth87514986@if3 UP             10.244.2.1/32 
+veth9829983c@if3 UP             10.244.2.1/32 
+veth010c83ae@if3 UP             10.244.2.1/32 
+vetha1079faf@if3 UP             10.244.2.1/32 
 ```
 
 They each act as the default gateway for their peer Pods and don't have to be attached to a bridge.
@@ -89,7 +89,7 @@ We'll assume that the ARP and MAC tables are converged and fully populated.
 
 ```
 $ kubectl exec -it net-tshoot-wxgcw -- ip route get 10.244.0.5
-10.244.0.5 via 10.244.2.1 dev eth0 src 10.244.2.3 uid 0 
+10.244.0.5 via 10.244.1.1 dev eth0 src 10.244.1.3 uid 0 
 ```
 
 2. The packet is sent down the veth link and pops out in the root network namespace of the host, which repeats the lookup:
