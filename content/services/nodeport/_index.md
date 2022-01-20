@@ -160,7 +160,7 @@ $ ipt KUBE-SERVICES | grep NODEPORT
     1    60 KUBE-NODEPORTS  all  --  *      *       0.0.0.0/0            0.0.0.0/0            /* kubernetes service nodeports; NOTE: this must be the last rule in this chain */ ADDRTYPE match dst-type LOCAL
 ```
 
-Each of the configured NodePort Services will have two entries -- one to enable SNAT masquerading in the `KUBE-POSTROUTING` chain (see [ClusterIP walkthrough](/clusterip/dataplane/iptables/#use-case-2-any-to-service-communication) for more details) and another one for Endpoint-specific DNAT actions:
+Each of the configured NodePort Services will have two entries -- one to enable SNAT masquerading in the `KUBE-POSTROUTING` chain (see [ClusterIP walkthrough](/services/clusterip/dataplane/iptables/#use-case-2-any-to-service-communication) for more details) and another one for Endpoint-specific DNAT actions:
 
 ```
 $ ipt KUBE-NODEPORTS
