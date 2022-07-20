@@ -31,7 +31,7 @@ HUGO_VERSION = "0.74.3"
 HUGO_ENABLEGITINFO = "true"
 
 [[redirects]]
-  from = "https://k8s.networkop.co.uk"
-  to = "https://tkng.io"
+  from = "https://k8s.networkop.co.uk/"
+  to = "https://www.tkng.io/"
   status = 301
   force = true
