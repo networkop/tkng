@@ -83,7 +83,7 @@ cni_plugin < /etc/cni/net.d/01-cni.conf
 
 The CNI plugin then does all of the required interface plumbing and IP allocation and returns back (prints to stdout) the resulting [data structure](https://github.com/containernetworking/cni/blob/master/SPEC.md#result). In the case of plugin chaining, all this information (original inputs + result) gets passed to all plugins along the chain.
 
-Despite its design simplicity, unless you have something else that takes care of establishing end-to-end reachability (e.g. cloud controller), a CNI binary must be accompanied by a long-running stateful daemon/agent. This daemon usually runs in the root network namespace and manages the Node's network stack between CNI binary invocations -- at the very least it adds and removes static routes as Nodes are added to or removed from the cluster. Its operation is not dictated by any standard and the only requirement is to established Pod-to-Pod reachability. 
+Despite its design simplicity, unless you have something else that takes care of establishing end-to-end reachability (e.g. cloud controller), a CNI binary must be accompanied by a long-running stateful daemon/agent. This daemon usually runs in the root network namespace and manages the Node's network stack between CNI binary invocations -- at the very least it adds and removes static routes as Nodes are added to or removed from the cluster. Its operation is not dictated by any standard and the only requirement is to establish Pod-to-Pod reachability. 
 
 {{% notice note %}}
 In reality, this daemon does a lot more than just manage reachability and may include a kube-proxy replacement, Kubernetes controller, IPAM etc.
