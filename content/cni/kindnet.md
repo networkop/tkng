@@ -54,7 +54,7 @@ docker exec -it k8s-guide-worker2 bash
 root@k8s-guide-worker2:/# ip route
 default via 172.18.0.1 dev eth0 
 10.244.0.0/24 via 172.18.0.10 dev eth0 
-10.244.1.0/24 via 172.18.0.12 dev eth0 
+10.244.1.0/24 via 172.18.0.11 dev eth0 
 10.244.2.2 dev vethf821f7f9 scope host 
 10.244.2.3 dev veth87514986 scope host 
 10.244.2.4 dev veth9829983c scope host 
