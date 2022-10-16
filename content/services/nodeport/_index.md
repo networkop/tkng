@@ -184,7 +184,7 @@ Chain KUBE-SVC-LOLE4ISW44XBNF3G (2 references)
 This is where the final Destination NAT translation takes place, each of the above chains translates the original destination IP and NodePort to the address of one of the Endpoints:
 
 ```
-$ ipt KUBE-SEP-3BXOQLMOWG4452TJ
+$ ipt KUBE-SEP-PJHHG4YJTBHVHUTY
 Chain KUBE-SEP-PJHHG4YJTBHVHUTY (1 references)
  pkts bytes target     prot opt in     out     source               destination
     0     0 KUBE-MARK-MASQ  all  --  *      *       10.244.1.6           0.0.0.0/0            /* default/web */
