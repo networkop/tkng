@@ -31,7 +31,7 @@ Here's an example of how different Kubernetes Resources are stacked together to 
 While the above is the canonical way of exposing an application in Kubernetes, it is by no way the only one. Like in any typical cloud infrastructure, the functions of different layers overlap and, thus, create a space for additional deployment scenarios:
 
 * **Ingress** can **proxy TCP and UDP** traffic to the backend ports. This works handy when the application protocol is not HTTP or if you want to string multiple Ingress proxies together. While Ingress controllers support this through custom [ConfigMaps](https://kubernetes.github.io/ingress-nginx/user-guide/exposing-tcp-udp-services/) or [annotations](https://docs.citrix.com/en-us/citrix-k8s-ingress-controller/how-to/tcp-udp-ingress.html), the gateway API project (which can be viewed as an evolution of Ingress) supports these features [natively](https://gateway-api.sigs.k8s.io/guides/tcp/).
-* **Service** of type **LoadBalancer or NodePort** can be used to expose backend ports without an Ingress. This can be useful when the pods need to expose an esoteric protocol (e.g. NETCONF) or when application proxy functions are simply not needed, e.g. small-scale, internal cluster, with not need for TLS termination or traffic rate-limiting.
+* **Service** of type **LoadBalancer or NodePort** can be used to expose backend ports without an Ingress. This can be useful when the pods need to expose an esoteric protocol (e.g. NETCONF) or when application proxy functions are simply not needed, e.g. small-scale, internal cluster, with no need for TLS termination or traffic rate-limiting.
 
 
 {{% notice note %}}
