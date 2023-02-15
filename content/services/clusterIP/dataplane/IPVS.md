@@ -277,7 +277,7 @@ It should be noted that, similar to the iptables mode, all of the above lookups 
 
 ### Additional reading
 
-[Scaling Kubernetes to Support 50,000 Services](https://docs.google.com/presentation/d/1BaIAywY2qqeHtyGZtlyAp89JIZs59MZLKcFLxKE6LyM/edit#slide=id.p19)
+[Scaling Kubernetes to Support 50,000 Services](https://github.com/sbueringer/kubecon-slides/blob/4a793c54a5bb31ededb2ec3ba230aaa94bc003d7/slides/2017-kubecon-eu/Scale%20Kubernetes%20to%20Support%2050,000%20Services%20%5BI%5D%20-%20Haibin%20Xie%20&%20Quinton%20Hoole,%20Huawei%20Technologies%20-%20Scale%20Kubernetes%20to%20Support%2050000%20Services.pdf)
 
 [Comparing kube-proxy modes: iptables or IPVS?](https://www.projectcalico.org/comparing-kube-proxy-modes-iptables-or-ipvs/)
 
