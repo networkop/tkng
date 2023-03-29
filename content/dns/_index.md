@@ -107,6 +107,7 @@ DNS is widely regarded as the main [source](https://isitdns.com/) of all IT prob
 
 * The [**authopath** plugin](https://coredns.io/plugins/autopath/) can be enabled in CoreDNS to make it follow the chain of search paths on behalf of a client, thereby reducing the number of queries for an external domain required by the client from 4 (see above) to just one.
 * Each Kubernetes Node can run a [**NodeLocal DNSCache**](https://kubernetes.io/docs/tasks/administer-cluster/nodelocaldns/) -- a daemonset of recursive DNS resolvers designed to reduce the load on a centralised CoreDNS deployment by serving as a caching layer between Pods and the DNS service.
+* Adjust lookups that are used frequently to add a trailing dot (example, `tkng.io.`). This is most effective for external hostnames that experience overhead as an absolute query is performed, avoiding the search path expansion through the `cluster.local`, and potentially other search domains in `/etc/resolv.conf`.
 
 
 ## External DNS
