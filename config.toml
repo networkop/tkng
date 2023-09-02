@@ -3,8 +3,6 @@ languageCode = "en-us"
 title = "The Kubernetes Networking Guide"
 theme = "hugo-theme-learn"
 
-googleAnalytics = "UA-31517751-3"
-
 [outputs]
 home = [ "HTML", "RSS", "JSON"]
 
