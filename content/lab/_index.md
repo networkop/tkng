@@ -27,7 +27,7 @@ Some **optional extras** that may make your life a lot easier:
 
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#optional-kubectl-configurations) and [docker](https://github.com/docker/docker-ce/tree/master/components/cli/contrib/completion) commands auto-completion.
 * [kubens/kubectx](https://github.com/ahmetb/kubectx) to easily switch between namespaces and contexts.
-* [stern](https://github.com/wercker/stern) to read logs from multiple Pods at the same time.
+* [stern](https://github.com/stern/stern) to read logs from multiple Pods at the same time.
 * [k9s](https://github.com/derailed/k9s) is a very convinient terminal dashboard for a Kubernetes cluster.
 
 Installation instructions will depend on the operating system. Here's an example [bash bootstrap script](https://gist.github.com/hellt/61242c680c78c3c813f20ecb9577a93e) for Ubuntu 20.4 LTS x86_64.
