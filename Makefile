@@ -1,5 +1,5 @@
 # That's because i have two hugo versions
-HUGO := hugo-0.74.3
+HUGO := hugo
 
 RANDOM_STR = 
 
