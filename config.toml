@@ -7,7 +7,7 @@ theme = "hugo-theme-relearn"
     mermaid = false
     disableInlineCopyToClipBoard = true
     editURL = "https://github.com/networkop/k8s-networking-guide/tree/master/content/${FilePath}"
-    themeVariant = [ "auto", "relearn-light", "relearn-dark", "learn" ]
+    themeVariant = [ "learn", "relearn-light", "relearn-dark" ]
     [params.search]
         disable = false
         [params.search.index]
